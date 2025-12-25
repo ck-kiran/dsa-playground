@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/microfrontends.json",
+  "applications": {
+    "dsa-playground": {
+      "development": {
+        "local": 3001
+      },
+      "routing": [
+        {
+          "group": "dsa",
+          "paths": ["/dsa", "/dsa/*"]
+        }
+      ]
+    }
+  }
+}

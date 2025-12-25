@@ -1,7 +1,7 @@
+const { withMicrofrontends } = require('@vercel/microfrontends');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  basePath: '/dsa',
-  assetPrefix: '/dsa',
   trailingSlash: false,
   async headers() {
     return [
@@ -26,4 +26,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+module.exports = withMicrofrontends(nextConfig);
