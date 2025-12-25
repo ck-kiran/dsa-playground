@@ -1,19 +1,22 @@
 {
-  "dsa-playground": {
-    "development": {
-      "local": 3001
-    },
-    "production": {
-      "fallback": "dsa-playground-three.vercel.app"
-    },
-    "routing": [
-      {
-        "group": "dsa",
-        "paths": [
-          "/dsa",
-          "/dsa/:path*"
-        ]
-      }
-    ]
+  "$schema": "https://openapi.vercel.sh/microfrontends.json",
+  "applications": {
+    "dsa-playground": {
+      "development": {
+        "local": 3001
+      },
+      "production": {
+        "fallback": "dsa-playground-three.vercel.app"
+      },
+      "routing": [
+        {
+          "group": "dsa",
+          "paths": [
+            "/dsa",
+            "/dsa/:path*"
+          ]
+        }
+      ]
+    }
   }
 }
