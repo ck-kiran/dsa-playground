@@ -76,7 +76,7 @@ export default async function PatternPage({
                     </td>
                     <td className="px-6 py-4 text-right">
                       <Button asChild size="sm" variant="outline">
-                        <Link href={`/dsa/${topic.id}/${pattern.id}/${problem.id}`}>
+                        <Link href={`/${topic.id}/${pattern.id}/${problem.id}`}>
                           Solve <Play className="w-3 h-3 ml-2" />
                         </Link>
                       </Button>

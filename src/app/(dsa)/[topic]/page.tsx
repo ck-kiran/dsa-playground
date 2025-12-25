@@ -30,7 +30,7 @@ export default async function TopicPage({ params }: { params: Promise<{ topic: s
           topic.patterns.map(pattern => (
             <Link
               key={pattern.id}
-              href={`/dsa/${topic.id}/${pattern.id}`}
+              href={`/${topic.id}/${pattern.id}`}
               className="group p-6 bg-card border rounded-xl hover:border-primary transition-colors"
             >
               <h2 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors flex items-center justify-between">

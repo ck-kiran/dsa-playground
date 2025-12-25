@@ -22,7 +22,7 @@ export function TopicCard({ topic }: TopicCardProps) {
 
   return (
     <Link
-      href={`/dsa/${topic.id}`}
+      href={`/${topic.id}`}
       className="block p-6 bg-card border rounded-xl shadow-sm hover:shadow-md transition-all hover:-translate-y-1"
     >
       <div className="flex items-center gap-4 mb-4">

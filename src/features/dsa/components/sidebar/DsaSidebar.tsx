@@ -36,7 +36,7 @@ export function DsaSidebar() {
 
   // Auto-expand topic based on current path
   React.useEffect(() => {
-    const currentTopic = dsaTopics.find(topic => pathname.startsWith(`/dsa/${topic.id}`));
+    const currentTopic = dsaTopics.find(topic => pathname.startsWith(`/${topic.id}`));
     if (currentTopic && !expandedTopics.includes(currentTopic.id)) {
       setExpandedTopics(prev => [...prev, currentTopic.id]);
     }
@@ -91,7 +91,7 @@ export function DsaSidebar() {
             href="/"
             className={cn(
               'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors',
-              pathname === '/dsa'
+              pathname === '/'
                 ? 'bg-primary/10 text-primary'
                 : 'hover:bg-accent/50 text-muted-foreground hover:text-foreground',
               isCollapsed && 'justify-center px-0'
@@ -114,9 +114,9 @@ export function DsaSidebar() {
             const TopicIcon = iconMap[topic.icon] || LayoutList;
 
             const isChildActive = topic.patterns.some(pattern =>
-              pathname.startsWith(`/dsa/${topic.id}/${pattern.id}`)
+              pathname.startsWith(`/${topic.id}/${pattern.id}`)
             );
-            const isTopicActive = pathname === `/dsa/${topic.id}`;
+            const isTopicActive = pathname === `/${topic.id}`;
 
             return (
               <div key={topic.id} className="space-y-1">
@@ -146,7 +146,7 @@ export function DsaSidebar() {
                 {!isCollapsed && isExpanded && (
                   <div className="pl-4 space-y-1 relative before:absolute before:left-6 before:top-0 before:bottom-0 before:w-px before:bg-border">
                     {topic.patterns.map(pattern => {
-                      const patternPath = `/dsa/${topic.id}/${pattern.id}`;
+                      const patternPath = `/${topic.id}/${pattern.id}`;
                       const isPatternActive = pathname.startsWith(patternPath);
                       return (
                         <Link
