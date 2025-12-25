@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  basePath: '/dsa',
+  assetPrefix: '/dsa',
   trailingSlash: false,
   async headers() {
     return [
