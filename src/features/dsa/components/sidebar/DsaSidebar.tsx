@@ -88,7 +88,7 @@ export function DsaSidebar() {
       <div className="p-3 space-y-4 flex-1">
         <div className="space-y-1">
           <Link
-            href="/dsa"
+            href="/"
             className={cn(
               'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors',
               pathname === '/dsa'
