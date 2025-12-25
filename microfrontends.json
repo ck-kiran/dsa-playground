@@ -8,7 +8,7 @@
       "routing": [
         {
           "group": "dsa",
-          "paths": ["/dsa", "/dsa/*"]
+          "paths": ["/dsa", "/dsa/:path*"]
         }
       ]
     }
