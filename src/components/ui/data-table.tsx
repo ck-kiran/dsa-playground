@@ -307,7 +307,7 @@ export function DataTable<T extends Record<string, any>>({
         <div className="overflow-auto max-w-full max-h-[430px] scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 flex-1">
           <table className="w-full min-w-[800px]">
             {/* Header */}
-            <thead className="bg-[#ffff] border-b sticky top-0 z-10">
+            <thead className="bg-background/95 backdrop-blur-sm border-b sticky top-0 z-10">
               <tr>
                 {columns.map((column) => (
                   <th

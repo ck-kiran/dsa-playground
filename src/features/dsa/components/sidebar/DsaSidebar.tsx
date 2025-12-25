@@ -19,6 +19,7 @@ import { usePathname } from 'next/navigation';
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
+import { ThemeSwitcher } from '@/components/ui/theme-switcher';
 import { dsaTopics } from '@/features/dsa/data/topics';
 import { cn } from '@/lib/utils';
 
@@ -188,6 +189,13 @@ export function DsaSidebar() {
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* Theme Switcher */}
+      <div className="p-3 border-t border-border/50 shrink-0">
+        <div className={cn("flex", isCollapsed ? "justify-center" : "justify-start")}>
+          <ThemeSwitcher />
         </div>
       </div>
     </aside>

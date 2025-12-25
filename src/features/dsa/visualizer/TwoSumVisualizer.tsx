@@ -17,7 +17,7 @@ export function TwoSumVisualizer({ step }: TwoSumVisualizerProps) {
           Array
         </h3>
         <div className="flex flex-wrap gap-2 justify-center items-end">
-          {array.map((value, index) => {
+          {array?.map((value, index) => {
             const isHighlighted = highlightIndices?.includes(index);
             const isCurr = pointers?.curr === index;
 

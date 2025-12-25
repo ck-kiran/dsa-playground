@@ -12,7 +12,7 @@ export function ArrayVisualizer({ step }: ArrayVisualizerProps) {
   return (
     <div className="flex flex-col items-center justify-center space-y-8 p-4 bg-secondary/20 rounded-lg border min-h-[300px]">
       <div className="flex flex-wrap gap-2 justify-center items-end">
-        {array.map((value, index) => {
+        {array?.map((value, index) => {
           const isHighlighted = highlightIndices?.includes(index);
           const isMid = pointers?.mid === index;
           const isLeft = pointers?.left === index;
