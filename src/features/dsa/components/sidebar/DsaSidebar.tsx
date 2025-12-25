@@ -66,10 +66,10 @@ export function DsaSidebar() {
           isCollapsed ? 'flex-col justify-center gap-2' : 'justify-between'
         )}
       >
-        <Button variant="ghost" size="icon" asChild className="h-8 w-8" title="Back to Home">
-          <Link href="/">
+        <Button variant="ghost" size="icon" asChild className="h-8 w-8" title="Back to Portfolio">
+          <a href="/">
             <ArrowLeft className="w-4 h-4" />
-          </Link>
+          </a>
         </Button>
         <Button
           variant="ghost"
