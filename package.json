@@ -1,0 +1,46 @@
+{
+  "name": "dsa-playground",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Data Structures and Algorithms Playground with Interactive Visualizations",
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-slot": "^1.2.4",
+    "acorn": "^8.11.3",
+    "astring": "^1.8.6",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.0",
+    "estree-walker": "^3.0.3",
+    "framer-motion": "^12.23.26",
+    "lucide-react": "^0.344.0",
+    "next": "^16.0.0",
+    "next-themes": "^0.4.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tailwind-merge": "^2.2.1"
+  },
+  "devDependencies": {
+    "@module-federation/nextjs-mf": "^8.5.2",
+    "@module-federation/utilities": "^3.0.11",
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "autoprefixer": "^10.4.17",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "^15.0.0",
+    "postcss": "^8.4.33",
+    "prettier": "^3.2.4",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.89.0"
+  }
+}
