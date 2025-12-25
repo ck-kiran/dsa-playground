@@ -12,6 +12,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   ArrowLeft,
+  BookOpen,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -100,6 +101,20 @@ export function DsaSidebar() {
           >
             <LayoutDashboard className="w-4 h-4 shrink-0" />
             {!isCollapsed && <span>Dashboard</span>}
+          </Link>
+          <Link
+            href="/problems"
+            className={cn(
+              'flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors',
+              pathname === '/problems'
+                ? 'bg-primary/10 text-primary'
+                : 'hover:bg-accent/50 text-muted-foreground hover:text-foreground',
+              isCollapsed && 'justify-center px-0'
+            )}
+            title={isCollapsed ? 'All Problems' : undefined}
+          >
+            <BookOpen className="w-4 h-4 shrink-0" />
+            {!isCollapsed && <span>All Problems</span>}
           </Link>
         </div>
 
