@@ -4,7 +4,7 @@
   "private": true,
   "description": "Data Structures and Algorithms Playground with Interactive Visualizations",
   "scripts": {
-    "dev": "next dev --webpack -p 3001",
+    "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
@@ -22,7 +22,7 @@
     "clsx": "^2.1.0",
     "estree-walker": "^3.0.3",
     "framer-motion": "^12.23.26",
-    "lucide-react": "^0.344.0",
+    "lucide-react": "^0.468.0",
     "next": "^16.0.0",
     "next-themes": "^0.4.6",
     "react": "^19.0.0",
@@ -31,8 +31,6 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@module-federation/nextjs-mf": "^8.5.2",
-    "@module-federation/utilities": "^3.0.11",
     "@types/node": "^20.11.0",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
@@ -41,7 +39,6 @@
     "postcss": "^8.5.6",
     "prettier": "^3.2.4",
     "tailwindcss": "^4.1.18",
-    "typescript": "^5.3.3",
-    "webpack": "^5.89.0"
+    "typescript": "^5.3.3"
   }
 }
