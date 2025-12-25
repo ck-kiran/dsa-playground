@@ -34,8 +34,16 @@ export default async function ProblemPage({
   const problem = pattern.problems.find(p => p.id === resolvedParams.problemId);
   if (!problem) return notFound();
 
-  // For now, we only have actual visualizers for specific problems
-  if (problem.id === 'binary-search-visualizer' || problem.id === 'two-sum-visualizer') {
+  // Check if we have a visualizer for this problem
+  const availableVisualizers = [
+    'binary-search-visualizer',
+    'two-sum-visualizer',
+    'string-search-visualizer',
+    'reverse-list-visualizer',
+    'tree-traversal-visualizer'
+  ];
+
+  if (availableVisualizers.includes(problem.id)) {
     return <DsaPlaygroundPage problemId={problem.id} />;
   }
 

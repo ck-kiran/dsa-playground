@@ -53,7 +53,21 @@ export const dsaTopics: Topic[] = [
     title: 'Strings',
     description: 'Sequence of characters.',
     icon: 'Type',
-    patterns: [],
+    patterns: [
+      {
+        id: 'pattern-matching',
+        title: 'Pattern Matching',
+        description: 'Find patterns within strings efficiently.',
+        problems: [
+          {
+            id: 'string-search-visualizer',
+            title: 'String Search',
+            difficulty: 'Medium',
+            description: 'Visualize pattern matching algorithms like KMP or Boyer-Moore.',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'linked-lists',
@@ -61,14 +75,42 @@ export const dsaTopics: Topic[] = [
     description:
       'Linear data structure where elements are not stored at contiguous memory locations.',
     icon: 'Link',
-    patterns: [],
+    patterns: [
+      {
+        id: 'list-manipulation',
+        title: 'List Manipulation',
+        description: 'Common operations on linked lists.',
+        problems: [
+          {
+            id: 'reverse-list-visualizer',
+            title: 'Reverse Linked List',
+            difficulty: 'Easy',
+            description: 'Visualize how to reverse a linked list step by step.',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'trees',
     title: 'Trees',
     description: 'Hierarchical data structure.',
     icon: 'Network',
-    patterns: [],
+    patterns: [
+      {
+        id: 'tree-traversal',
+        title: 'Tree Traversal',
+        description: 'Different ways to visit nodes in a tree.',
+        problems: [
+          {
+            id: 'tree-traversal-visualizer',
+            title: 'Binary Tree Traversal',
+            difficulty: 'Medium',
+            description: 'Visualize in-order, pre-order, and post-order tree traversals.',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'hash-maps',
