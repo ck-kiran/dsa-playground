@@ -33,7 +33,7 @@ export function generateReverseListSteps(initialList: number[]): Step[] {
   let stepCount = 1;
   while (current !== null) {
     // Store next before we lose it
-    const nextNode = list[current].next;
+    const nextNode: number | null = list[current].next;
 
     // Show the step before reversing
     steps.push({
