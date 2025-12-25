@@ -16,6 +16,7 @@
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@tailwindcss/postcss": "^4.1.18",
+    "@vercel/microfrontends": "^2.2.1",
     "acorn": "^8.11.3",
     "astring": "^1.8.6",
     "class-variance-authority": "^0.7.1",
