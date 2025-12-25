@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   trailingSlash: false,
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/dsa-assets' : '',
   async headers() {
     return [
       {
