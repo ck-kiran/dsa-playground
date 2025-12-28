@@ -1,249 +1,118 @@
 'use client';
 
-import { Play, RotateCcw, AlertTriangle, Info, Code2, Presentation, ArrowLeft } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { Play, RotateCcw, AlertTriangle, Info, Code2, Presentation, ArrowLeft, ChevronDown, ChevronRight, Home } from 'lucide-react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import Link from 'next/link';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { instrumentCode } from '@/lib/code-instrumenter';
 
-import { generateBinarySearchSteps } from '@/domains/arrays/binary-search/algorithm';
-import { generateTwoSumSteps } from '@/domains/hash-maps/basic-hashing/algorithm';
-import { generateStringSearchSteps } from '@/domains/strings/pattern-matching/algorithm';
-import { generateReverseListSteps } from '@/domains/linked-lists/list-manipulation/algorithm';
-import { generateTreeTraversalSteps } from '@/domains/trees/tree-traversal/algorithm';
+import { problemRegistry } from '@/shared/services/problemRegistry';
+import { ProblemInputControls } from '@/shared/components/ProblemInputControls';
 import { Controls } from '@/shared/components/ui/Controls';
 import { CodeEditor } from '@/shared/components/ui/CodeEditor';
-import { BinarySearchVisualizer } from '@/domains/arrays/binary-search/visualizer';
-import { TwoSumVisualizer } from '@/domains/hash-maps/basic-hashing/visualizer';
-import { StringSearchVisualizer } from '@/domains/strings/pattern-matching/visualizer';
-import { LinkedListVisualizer } from '@/domains/linked-lists/list-manipulation/visualizer';
-import { TreeTraversalVisualizer } from '@/domains/trees/tree-traversal/visualizer';
+import { useDomain } from '@/shared/hooks/useDomain';
 
 import type { Step } from '@/shared/types/step';
 
-// Initial data configuration
-const BINARY_SEARCH_INITIAL = {
-  id: 'binary-search-visualizer',
-  array: [2, 5, 8, 12, 16, 23, 38, 56, 72, 91],
-  target: 23,
-  title: 'Binary Search',
-  difficulty: 'Easy',
-  description:
-    'Given a sorted array of integers and a target value, return the index of the target if it is present in the array. If it is not present, return -1.',
-  constraints: [
-    'Array is sorted in ascending order',
-    'Time Complexity: O(log N)',
-    'Space Complexity: O(1)',
-  ],
-  code: `function binarySearch(arr, target) {
-  let left = 0;
-  let right = arr.length - 1;
-
-  while (left <= right) {
-    const mid = Math.floor((left + right) / 2);
-
-    if (arr[mid] === target) {
-      return mid;
-    }
-
-    if (arr[mid] < target) {
-      left = mid + 1;
-    } else {
-      right = mid - 1;
-    }
-  }
-
-  return -1;
-}`,
-};
-
-const TWO_SUM_INITIAL = {
-  id: 'two-sum-visualizer',
-  array: [2, 7, 11, 15, 3, 6, 8],
-  target: 9,
-  title: 'Two Sum',
-  difficulty: 'Easy',
-  description:
-    'Find two numbers in an array that add up to a specific target value. Return the indices of the two numbers.',
-  constraints: [
-    'Each input has exactly one solution',
-    'You may not use the same element twice',
-    'Time Complexity: O(N)',
-    'Space Complexity: O(N)',
-  ],
-  code: `function twoSum(nums, target) {
-  const map = new Map();
-
-  for (let i = 0; i < nums.length; i++) {
-    const complement = target - nums[i];
-
-    if (map.has(complement)) {
-      return [map.get(complement), i];
-    }
-
-    map.set(nums[i], i);
-  }
-
-  return [];
-}`,
-};
-
-const STRING_SEARCH_INITIAL = {
-  id: 'string-search-visualizer',
-  text: 'ABAAABCDABABCABCABCDAB',
-  pattern: 'ABCAB',
-  title: 'String Search',
-  difficulty: 'Medium',
-  description:
-    'Find all occurrences of a pattern string within a text string using naive string matching algorithm.',
-  constraints: [
-    'Case sensitive matching',
-    'Time Complexity: O(N × M)',
-    'Space Complexity: O(1)',
-    'N = length of text, M = length of pattern',
-  ],
-  code: `function naiveStringSearch(text, pattern) {
-  const matches = [];
-
-  for (let i = 0; i <= text.length - pattern.length; i++) {
-    let j = 0;
-    while (j < pattern.length && text[i + j] === pattern[j]) {
-      j++;
-    }
-    if (j === pattern.length) {
-      matches.push(i);
-    }
-  }
-
-  return matches;
-}`,
-};
-
-const REVERSE_LIST_INITIAL = {
-  id: 'reverse-list-visualizer',
-  list: [1, 2, 3, 4, 5],
-  title: 'Reverse Linked List',
-  difficulty: 'Easy',
-  description:
-    'Reverse a singly linked list iteratively by adjusting the next pointers of each node.',
-  constraints: [
-    'Reverse in-place',
-    'Time Complexity: O(N)',
-    'Space Complexity: O(1)',
-    'N = number of nodes',
-  ],
-  code: `function reverseList(head) {
-  let prev = null;
-  let current = head;
-
-  while (current !== null) {
-    const next = current.next;
-    current.next = prev;
-    prev = current;
-    current = next;
-  }
-
-  return prev;
-}`,
-};
-
-const TREE_TRAVERSAL_INITIAL = {
-  id: 'tree-traversal-visualizer',
-  traversalType: 'inorder',
-  title: 'Binary Tree Traversal',
-  difficulty: 'Medium',
-  description:
-    'Traverse a binary tree using different strategies: inorder, preorder, and postorder.',
-  constraints: [
-    'Recursive implementation',
-    'Time Complexity: O(N)',
-    'Space Complexity: O(H)',
-    'N = number of nodes, H = height of tree',
-  ],
-  code: `function inorderTraversal(root) {
-  const result = [];
-
-  function traverse(node) {
-    if (node === null) return;
-
-    traverse(node.left);
-    result.push(node.val);
-    traverse(node.right);
-  }
-
-  traverse(root);
-  return result;
-}`,
-};
-
 interface DsaPlaygroundPageProps {
   problemId?: string;
+  topicId?: string;
+  patternId?: string;
 }
 
 export function DsaPlaygroundPage({
   problemId = 'binary-search-visualizer',
+  topicId,
+  patternId,
 }: DsaPlaygroundPageProps) {
-  const getConfig = () => {
-    switch (problemId) {
-      case 'two-sum-visualizer':
-        return TWO_SUM_INITIAL;
-      case 'string-search-visualizer':
-        return STRING_SEARCH_INITIAL;
-      case 'reverse-list-visualizer':
-        return REVERSE_LIST_INITIAL;
-      case 'tree-traversal-visualizer':
-        return TREE_TRAVERSAL_INITIAL;
-      default:
-        return BINARY_SEARCH_INITIAL;
-    }
-  };
+  const problemModule = problemRegistry.get(problemId);
+  const { getTopicById, getPatternById } = useDomain();
 
-  const config = getConfig();
+  const topic = topicId ? getTopicById(topicId) : null;
+  const pattern = topicId && patternId ? getPatternById(topicId, patternId) : null;
+
+  if (!problemModule) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Problem Not Found</AlertTitle>
+          <AlertDescription>
+            The problem "{problemId}" could not be loaded.
+          </AlertDescription>
+        </Alert>
+      </div>
+    );
+  }
+
+  const { config } = problemModule;
 
   // View State
   const [activeTab, setActiveTab] = useState<'code' | 'visualize'>('code');
-
-  const [target, setTarget] = useState<number>((config as any).target || 0);
-  const [text, setText] = useState<string>((config as any).text || '');
-  const [pattern, setPattern] = useState<string>((config as any).pattern || '');
-  const [traversalType, setTraversalType] = useState<string>((config as any).traversalType || 'inorder');
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [userCode, setUserCode] = useState(() => config.code);
+  const [userCode, setUserCode] = useState(config.defaultCode);
   const [customSteps, setCustomSteps] = useState<Step[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedApproach, setSelectedApproach] = useState(config.approaches?.[0]?.id || 'default');
+  const [isApproachDropdownOpen, setIsApproachDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Problem inputs state
+  const [inputs, setInputs] = useState<Record<string, unknown>>(
+    config.defaultInputs || {}
+  );
 
   // Reset state when problem changes
   const [lastProblemId, setLastProblemId] = useState(problemId);
   if (lastProblemId !== problemId) {
     setLastProblemId(problemId);
-    setUserCode(config.code);
+    setUserCode(config.defaultCode);
     setCustomSteps(null);
     setError(null);
-    setTarget((config as any).target || 0);
-    setText((config as any).text || '');
-    setPattern((config as any).pattern || '');
-    setTraversalType((config as any).traversalType || 'inorder');
+    setInputs(config.defaultInputs || {});
     setCurrentStepIndex(0);
     setActiveTab('code');
+    setSelectedApproach(config.approaches?.[0]?.id || 'default');
   }
 
+  // Get selected approach
+  const currentApproach = config.approaches?.find(a => a.id === selectedApproach);
+  const displayCode = currentApproach?.code || config.defaultCode;
+
+  // Handle approach change
+  const handleApproachChange = (approachId: string) => {
+    setSelectedApproach(approachId);
+    const approach = config.approaches?.find(a => a.id === approachId);
+    setUserCode(approach?.code || config.defaultCode);
+    setIsApproachDropdownOpen(false);
+  };
+
+  // Generate breadcrumb items
+  const breadcrumbItems = [
+    { label: 'Home', href: '/' },
+    ...(topic ? [{ label: topic.title, href: `/${topicId}` }] : []),
+    ...(pattern ? [{ label: pattern.title, href: `/${topicId}/${patternId}` }] : []),
+    { label: config.title }
+  ];
+
+  // Handle click outside dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsApproachDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Generate default steps based on current inputs
   const defaultSteps: Step[] = useMemo(() => {
-    switch (problemId) {
-      case 'two-sum-visualizer':
-        return generateTwoSumSteps((config as any).array, target);
-      case 'string-search-visualizer':
-        return generateStringSearchSteps(text, pattern);
-      case 'reverse-list-visualizer':
-        return generateReverseListSteps((config as any).list);
-      case 'tree-traversal-visualizer':
-        return generateTreeTraversalSteps(traversalType as any);
-      default:
-        return generateBinarySearchSteps((config as any).array, target);
-    }
-  }, [target, text, pattern, traversalType, problemId, config]);
+    return problemModule.generateSteps(inputs);
+  }, [inputs, problemModule]);
 
   const steps = customSteps || defaultSteps;
   const currentStep = steps[currentStepIndex] || steps[steps.length - 1];
@@ -258,29 +127,8 @@ export function DsaPlaygroundPage({
     setCurrentStepIndex(0);
   };
 
-  const handleTargetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseInt(e.target.value);
-    if (!isNaN(val)) {
-      setTarget(val);
-      setCurrentStepIndex(0);
-      setCustomSteps(null);
-    }
-  };
-
-  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setText(e.target.value);
-    setCurrentStepIndex(0);
-    setCustomSteps(null);
-  };
-
-  const handlePatternChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPattern(e.target.value);
-    setCurrentStepIndex(0);
-    setCustomSteps(null);
-  };
-
-  const handleTraversalTypeChange = (type: string) => {
-    setTraversalType(type);
+  const handleInputChange = (newInputs: Record<string, unknown>) => {
+    setInputs(newInputs);
     setCurrentStepIndex(0);
     setCustomSteps(null);
   };
@@ -288,28 +136,11 @@ export function DsaPlaygroundPage({
   const handleRunCode = () => {
     setError(null);
     setCustomSteps(null);
+
     try {
-      // For new problem types, we'll use default steps since code execution is complex
-      // Users can still modify and see how the algorithm works conceptually
-      if (problemId === 'string-search-visualizer') {
-        setCustomSteps(generateStringSearchSteps(text, pattern));
-        setCurrentStepIndex(0);
-        setActiveTab('visualize');
-        return;
-      }
-
-      if (problemId === 'reverse-list-visualizer') {
-        const configList = (config as any).list;
-        if (configList) {
-          setCustomSteps(generateReverseListSteps(configList));
-          setCurrentStepIndex(0);
-          setActiveTab('visualize');
-        }
-        return;
-      }
-
-      if (problemId === 'tree-traversal-visualizer') {
-        setCustomSteps(generateTreeTraversalSteps(traversalType as any));
+      // For most problems, use default steps since code execution is complex
+      if (problemId !== 'binary-search-visualizer' && problemId !== 'two-sum-visualizer') {
+        setCustomSteps(problemModule.generateSteps(inputs));
         setCurrentStepIndex(0);
         setActiveTab('visualize');
         return;
@@ -336,7 +167,7 @@ export function DsaPlaygroundPage({
                 : undefined;
 
           recordedSteps.push({
-            array: (config as any).array,
+            array: inputs.array as number[],
             pointers: { curr: i || 0 },
             hashMap: mapObj,
             message:
@@ -355,7 +186,7 @@ export function DsaPlaygroundPage({
 
           let message = '';
           if (hasMid && typeof mid === 'number') {
-            message = `Checking mid index ${mid} (value: ${(config as any).array[mid]})`;
+            message = `Checking mid index ${mid} (value: ${(inputs.array as number[])[mid]})`;
           } else if (hasRange) {
             message = `Searching range [${left}, ${right}]`;
           } else {
@@ -363,7 +194,7 @@ export function DsaPlaygroundPage({
           }
 
           recordedSteps.push({
-            array: (config as any).array,
+            array: inputs.array as number[],
             pointers: { left: left || 0, right: right || 0, mid: mid || 0 },
             highlightIndices: hasMid && typeof mid === 'number' ? [mid] : [],
             message: message,
@@ -384,29 +215,58 @@ export function DsaPlaygroundPage({
       `
       );
 
-      runner((config as any).array, target, logStep);
+      runner(inputs.array, inputs.target, logStep);
 
       if (recordedSteps.length === 0) {
         setError('No steps recorded. Loop might not have executed.');
       } else {
         setCustomSteps(recordedSteps);
         setCurrentStepIndex(0);
-        setActiveTab('visualize'); // Automatically switch to visualizer on success
+        setActiveTab('visualize');
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
+  // Dynamically render the visualizer
+  const VisualizerComponent = problemModule.Visualizer;
+
   return (
-    <div className="w-full h-full flex flex-col p-4 gap-4 overflow-hidden relative">
+    <div className="w-full h-full flex flex-col p-2 sm:p-4 gap-2 sm:gap-4 overflow-hidden relative">
+      {/* Breadcrumb */}
+      <div className="shrink-0">
+        <nav className="flex items-center space-x-2 text-xs sm:text-sm text-muted-foreground overflow-x-auto">
+          {breadcrumbItems.map((item, index) => (
+            <div key={index} className="flex items-center space-x-2 whitespace-nowrap">
+              {index === 0 && <Home className="w-3 h-3 sm:w-4 sm:h-4" />}
+              {item.href ? (
+                <Link
+                  href={item.href}
+                  className="hover:text-foreground transition-colors"
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <span className="text-foreground font-medium">{item.label}</span>
+              )}
+              {index < breadcrumbItems.length - 1 && (
+                <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
+              )}
+            </div>
+          ))}
+        </nav>
+      </div>
+
       {/* Header Bar */}
-      <div className="flex items-center justify-between shrink-0 px-2 h-10">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold tracking-tight">{config.title}</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between shrink-0 px-2 gap-2 sm:gap-4 min-h-10">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <h1 className="text-lg sm:text-2xl font-bold tracking-tight">{config.title}</h1>
           <span
-            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold
-            ${config.difficulty === 'Easy' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'}
+            className={`px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-semibold
+            ${config.difficulty === 'Easy' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+              config.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
+              'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}
           `}
           >
             {config.difficulty}
@@ -436,24 +296,24 @@ export function DsaPlaygroundPage({
 
       {/* Code View */}
       {activeTab === 'code' && (
-        <div className="flex-1 flex gap-4 min-h-0 animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0 animate-in fade-in zoom-in-95 duration-200">
           {/* Left Panel: Problem Statement */}
-          <div className="w-[35%] flex flex-col gap-4 overflow-hidden">
-            <div className="bg-card border rounded-xl flex flex-col shadow-sm h-full overflow-hidden">
+          <div className="w-full lg:w-[35%] flex flex-col gap-4 overflow-hidden">
+            <div className="bg-card border rounded-xl flex flex-col shadow-sm h-full lg:min-h-0 overflow-hidden">
               <div className="px-4 py-3 border-b bg-muted/30 flex items-center gap-2 text-sm font-medium">
                 <Info className="w-4 h-4 text-primary" />
                 Problem Statement
               </div>
-              <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
+              <div className="p-4 lg:p-6 overflow-y-auto custom-scrollbar flex-1">
                 <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <p className="text-muted-foreground leading-relaxed text-base">
+                  <p className="text-muted-foreground leading-relaxed text-sm lg:text-base">
                     {config.description}
                   </p>
 
-                  <h4 className="text-foreground font-semibold mt-6 mb-2 uppercase text-xs tracking-wider">
+                  <h4 className="text-foreground font-semibold mt-4 lg:mt-6 mb-2 uppercase text-xs tracking-wider">
                     Constraints
                   </h4>
-                  <ul className="space-y-1 list-disc pl-4 text-sm text-muted-foreground">
+                  <ul className="space-y-1 list-disc pl-4 text-xs lg:text-sm text-muted-foreground">
                     {config.constraints.map((c, i) => (
                       <li key={i}>{c}</li>
                     ))}
@@ -466,31 +326,66 @@ export function DsaPlaygroundPage({
           {/* Right Panel: Code Editor */}
           <div className="flex-1 flex flex-col gap-4 overflow-hidden">
             <div className="flex-1 flex flex-col overflow-hidden bg-card border rounded-xl shadow-sm h-full">
-              <div className="px-4 py-2 border-b bg-muted/30 flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-2 text-sm font-medium">
-                  <Code2 className="w-4 h-4 text-primary" />
-                  Solution
+              <div className="px-4 py-2 border-b bg-muted/30 flex flex-col sm:flex-row sm:items-center justify-between shrink-0 gap-2">
+                <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <Code2 className="w-4 h-4 text-primary" />
+                    Solution
+                  </div>
+                  {/* Code Approach Dropdown */}
+                  {config.approaches && config.approaches.length > 0 && (
+                    <div ref={dropdownRef} className="relative">
+                      <button
+                        onClick={() => setIsApproachDropdownOpen(!isApproachDropdownOpen)}
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium border rounded-md hover:bg-muted/50 transition-colors"
+                      >
+                        <span className="truncate max-w-[120px] sm:max-w-none">{currentApproach?.title || 'Default'}</span>
+                        <ChevronDown className="w-3 h-3 shrink-0" />
+                      </button>
+                      {isApproachDropdownOpen && (
+                        <div className="absolute top-full left-0 mt-1 min-w-[200px] bg-background border rounded-md shadow-lg z-50">
+                          {config.approaches.map((approach) => (
+                            <button
+                              key={approach.id}
+                              onClick={() => handleApproachChange(approach.id)}
+                              className={`w-full px-3 py-2 text-left text-xs hover:bg-muted transition-colors ${
+                                selectedApproach === approach.id ? 'bg-muted' : ''
+                              }`}
+                            >
+                              <div className="font-medium">{approach.title}</div>
+                              <div className="text-muted-foreground text-[10px] mt-0.5">
+                                Time: {approach.timeComplexity} | Space: {approach.spaceComplexity}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setUserCode(config.code)}
+                    onClick={() => setUserCode(currentApproach?.code || config.defaultCode)}
                     title="Reset Code"
+                    className="h-7 w-7 p-0 sm:h-8 sm:w-auto sm:px-3"
                   >
-                    <RotateCcw className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+                    <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground hover:text-foreground" />
                   </Button>
                   <Button
                     size="sm"
                     onClick={handleRunCode}
-                    className="h-8 gap-2 bg-green-600 hover:bg-green-700 text-white border-0"
+                    className="h-7 sm:h-8 gap-1 sm:gap-2 bg-green-600 hover:bg-green-700 text-white border-0 text-xs"
                   >
-                    <Play className="w-3 h-3 fill-current" /> Run & Visualize
+                    <Play className="w-3 h-3 fill-current" />
+                    <span className="hidden sm:inline">Run & Visualize</span>
+                    <span className="sm:hidden">Run</span>
                   </Button>
                 </div>
               </div>
               <div className="flex-1 min-h-0">
-                <CodeEditor initialCode={userCode} onChange={v => setUserCode(v || '')} />
+                <CodeEditor value={userCode} onChange={v => setUserCode(v || '')} />
               </div>
             </div>
 
@@ -509,100 +404,34 @@ export function DsaPlaygroundPage({
       {activeTab === 'visualize' && (
         <div className="flex-1 flex flex-col gap-4 min-h-0 animate-in fade-in zoom-in-95 duration-200">
           <div className="flex-1 flex flex-col bg-card border rounded-xl shadow-sm overflow-hidden">
-            <div className="px-4 py-2 border-b bg-muted/30 flex items-center justify-between shrink-0">
+            <div className="px-4 py-2 border-b bg-muted/30 flex flex-col sm:flex-row sm:items-center justify-between shrink-0 gap-2">
               <div className="flex items-center gap-2 text-sm font-medium">
                 <Presentation className="w-4 h-4 text-primary" />
                 Visualization
               </div>
-              <div className="flex items-center gap-3">
-                {/* Dynamic input controls based on problem type */}
-                {(problemId === 'binary-search-visualizer' || problemId === 'two-sum-visualizer') && (
-                  <div className="flex items-center gap-2 mr-2">
-                    <Label
-                      htmlFor="visualizer-target"
-                      className="text-xs text-muted-foreground whitespace-nowrap"
-                    >
-                      Target Value:
-                    </Label>
-                    <Input
-                      type="number"
-                      id="visualizer-target"
-                      value={target}
-                      onChange={handleTargetChange}
-                      className="h-7 w-20 text-xs bg-background"
-                    />
-                  </div>
-                )}
-                {problemId === 'string-search-visualizer' && (
-                  <>
-                    <div className="flex items-center gap-2 mr-2">
-                      <Label className="text-xs text-muted-foreground whitespace-nowrap">
-                        Text:
-                      </Label>
-                      <Input
-                        type="text"
-                        value={text}
-                        onChange={handleTextChange}
-                        className="h-7 w-32 text-xs bg-background"
-                      />
-                    </div>
-                    <div className="flex items-center gap-2 mr-2">
-                      <Label className="text-xs text-muted-foreground whitespace-nowrap">
-                        Pattern:
-                      </Label>
-                      <Input
-                        type="text"
-                        value={pattern}
-                        onChange={handlePatternChange}
-                        className="h-7 w-20 text-xs bg-background"
-                      />
-                    </div>
-                  </>
-                )}
-                {problemId === 'tree-traversal-visualizer' && (
-                  <div className="flex items-center gap-2 mr-2">
-                    <Label className="text-xs text-muted-foreground whitespace-nowrap">
-                      Type:
-                    </Label>
-                    <select
-                      value={traversalType}
-                      onChange={(e) => handleTraversalTypeChange(e.target.value)}
-                      className="h-7 text-xs bg-background border border-input rounded-md px-2"
-                    >
-                      <option value="inorder">Inorder</option>
-                      <option value="preorder">Preorder</option>
-                      <option value="postorder">Postorder</option>
-                    </select>
-                  </div>
-                )}
-                <Button variant="ghost" size="sm" onClick={() => setActiveTab('code')}>
-                  <ArrowLeft className="w-4 h-4 mr-2" /> Back to Code
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                {/* Dynamic input controls */}
+                <ProblemInputControls
+                  problemId={problemId}
+                  inputs={inputs}
+                  onChange={handleInputChange}
+                />
+                <Button variant="ghost" size="sm" onClick={() => setActiveTab('code')} className="h-7 sm:h-8">
+                  <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="text-xs sm:text-sm">Back</span>
                 </Button>
-                <div className="h-4 w-px bg-border mx-1" />
+                <div className="h-4 w-px bg-border mx-1 hidden sm:block" />
                 <Button variant="outline" size="sm" onClick={handleReset} className="h-7 text-xs">
                   <RotateCcw className="w-3 h-3 mr-1" /> Reset
                 </Button>
               </div>
             </div>
 
-            <div className="flex-1 relative flex items-center justify-center p-8 bg-background/50 overflow-y-auto">
-              {(() => {
-                switch (problemId) {
-                  case 'two-sum-visualizer':
-                    return <TwoSumVisualizer step={currentStep} />;
-                  case 'string-search-visualizer':
-                    return <StringSearchVisualizer step={currentStep} />;
-                  case 'reverse-list-visualizer':
-                    return <LinkedListVisualizer step={currentStep} />;
-                  case 'tree-traversal-visualizer':
-                    return <TreeTraversalVisualizer step={currentStep} />;
-                  default:
-                    return <BinarySearchVisualizer step={currentStep} />;
-                }
-              })()}
+            <div className="flex-1 relative flex items-center justify-center p-4 sm:p-8 bg-background/50 overflow-y-auto">
+              {VisualizerComponent && <VisualizerComponent step={currentStep} />}
             </div>
 
-            <div className="p-4 border-t bg-muted/10 shrink-0">
+            <div className="p-2 sm:p-4 border-t bg-muted/10 shrink-0">
               <Controls
                 onNext={handleNext}
                 onReset={handleReset}

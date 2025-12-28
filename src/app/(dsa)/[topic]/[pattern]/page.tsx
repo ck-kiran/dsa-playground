@@ -6,8 +6,17 @@ import { notFound } from 'next/navigation';
 import { use } from 'react';
 
 import { PageLayout } from '@/components/layout/PageLayout';
+import { DataTable, DataTableColumn, DataTableFilter } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
 import { useDomain } from '@/shared/hooks/useDomain';
+import { Problem } from '@/shared/types/domain';
+import { getVisualizerStatus } from '@/shared/utils/constants';
+
+interface ExtendedProblem extends Problem {
+  route: string;
+  hasVisualizer: boolean;
+  status: 'Available' | 'Coming Soon';
+}
 
 export default function PatternPage({
   params,
@@ -23,6 +32,130 @@ export default function PatternPage({
     notFound();
   }
 
+  // Transform problems data for the table
+  const problemsData: ExtendedProblem[] = pattern.problems.map(problem => {
+    const hasVisualizer = getVisualizerStatus(problem.id) === 'Available';
+    return {
+      ...problem,
+      route: `/${topic.id}/${pattern.id}/${problem.id}`,
+      hasVisualizer,
+      status: hasVisualizer ? 'Available' : 'Coming Soon'
+    };
+  });
+
+  // Define table columns
+  const columns: DataTableColumn<ExtendedProblem>[] = [
+    {
+      key: 'title',
+      header: 'Problem',
+      sortable: true,
+      width: '300px',
+      render: (value, row) => (
+        <div className="space-y-1">
+          <div className="font-semibold text-base">{value}</div>
+          <div className="text-sm text-muted-foreground line-clamp-2">
+            {row.description}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'difficulty',
+      header: 'Difficulty',
+      sortable: true,
+      filterable: true,
+      width: '120px',
+      render: (value) => {
+        const difficultyColors = {
+          Easy: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400',
+          Medium: 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400',
+          Hard: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400',
+        };
+        return (
+          <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${difficultyColors[value as keyof typeof difficultyColors]}`}>
+            {value}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'status',
+      header: 'Status',
+      sortable: true,
+      filterable: true,
+      width: '120px',
+      render: (value) => {
+        const statusColors = {
+          'Available': 'bg-green-100 text-green-700 border-green-200',
+          'Coming Soon': 'bg-gray-100 text-gray-700 border-gray-200',
+        };
+        return (
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${value === 'Available' ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+            <span className={`px-2 py-1 rounded text-xs border ${statusColors[value as keyof typeof statusColors]}`}>
+              {value}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      key: 'hasVisualizer',
+      header: 'Action',
+      width: '150px',
+      render: (_, row) => (
+        <div className="flex items-center gap-2">
+          {row.hasVisualizer ? (
+            <Button size="sm" asChild>
+              <Link href={row.route}>
+                <Play className="w-4 h-4 mr-1" />
+                Solve
+              </Link>
+            </Button>
+          ) : (
+            <Button size="sm" variant="outline" disabled>
+              Coming Soon
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ];
+
+  // Generate dynamic filters
+  const uniqueDifficulties = [...new Set(problemsData.map(p => p.difficulty))].sort();
+  const uniqueStatuses = [...new Set(problemsData.map(p => p.status))].sort();
+
+  const filters: DataTableFilter[] = [
+    {
+      key: 'difficulty',
+      label: 'All Difficulties',
+      options: uniqueDifficulties.map(difficulty => ({
+        value: difficulty,
+        label: difficulty
+      })),
+    },
+    {
+      key: 'status',
+      label: 'All Statuses',
+      options: uniqueStatuses.map(status => ({
+        value: status,
+        label: status
+      })),
+    },
+  ];
+
+  // Calculate statistics
+  const availableCount = problemsData.filter(p => p.hasVisualizer).length;
+  const totalCount = problemsData.length;
+  const difficultyStats = problemsData.reduce(
+    (acc, problem) => {
+      acc[problem.difficulty.toLowerCase()]++;
+      return acc;
+    },
+    { easy: 0, medium: 0, hard: 0 } as Record<string, number>
+  );
+
   return (
     <PageLayout
       title={pattern.title}
@@ -33,57 +166,25 @@ export default function PatternPage({
         { label: pattern.title }
       ]}
     >
-      <div className="border rounded-lg overflow-hidden bg-card">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-muted/50 border-b">
-              <tr>
-                <th className="px-6 py-4 font-medium">Problem</th>
-                <th className="px-6 py-4 font-medium">Difficulty</th>
-                <th className="px-6 py-4 font-medium text-right">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {pattern.problems.length > 0 ? (
-                pattern.problems.map(problem => (
-                  <tr key={problem.id} className="hover:bg-muted/50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-base">{problem.title}</div>
-                      <div className="text-muted-foreground line-clamp-1">
-                        {problem.description}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                          ${problem.difficulty === 'Easy' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' : ''}
-                          ${problem.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' : ''}
-                          ${problem.difficulty === 'Hard' ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' : ''}
-                        `}
-                      >
-                        {problem.difficulty}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <Button asChild size="sm" variant="outline">
-                        <Link href={`/${topic.id}/${pattern.id}/${problem.id}`}>
-                          Solve <Play className="w-3 h-3 ml-2" />
-                        </Link>
-                      </Button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={3} className="px-6 py-12 text-center text-muted-foreground">
-                    No problems added to this pattern yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+
+      {/* Problems Table */}
+      <DataTable
+        data={problemsData}
+        columns={columns}
+        filters={filters}
+        searchable={true}
+        searchPlaceholder="Search problems..."
+        pagination={{
+          enabled: false,
+          pageSize: 10
+        }}
+        statusIndicator={{
+          total: totalCount,
+          active: availableCount,
+          label: 'Available'
+        }}
+        className="w-full"
+      />
     </PageLayout>
   );
 }

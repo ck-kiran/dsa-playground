@@ -197,7 +197,7 @@ export function DataTable<T extends Record<string, any>>({
   return (
     <div className={`space-y-4 w-full ${className}`}>
       {/* Filters and Controls */}
-      <div className="flex flex-wrap items-center gap-4 p-4 bg-background border rounded-lg">
+      <div className="flex flex-wrap items-center gap-4 p-4 bg-background border rounded-lg mt-4">
         {/* Filter Dropdowns */}
         {filters.map((filter) => (
           <div key={filter.key} className="relative">
