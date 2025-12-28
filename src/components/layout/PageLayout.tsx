@@ -30,7 +30,7 @@ export function PageLayout({
   ];
 
   return (
-    <div className={`max-w-7xl mx-auto space-y-8 p-8 overflow-y-auto h-full ${className}`}>
+    <div className={`max-w-7xl mx-auto p-8 overflow-y-auto h-full ${className}`}>
       {/* Breadcrumb Navigation */}
       {breadcrumbs.length > 0 && (
         <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
@@ -56,17 +56,17 @@ export function PageLayout({
       )}
 
       {/* Page Header */}
-      <div className="space-y-4">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
+      <div className='mt-4'>
+        <h1 className="text-xl font-bold tracking-tight sm:text-2xl">{title}</h1>
         {description && (
-          <p className="max-w-3xl text-muted-foreground text-lg">
+          <p className="max-w-3xl text-muted-foreground text-sm">
             {description}
           </p>
         )}
       </div>
 
       {/* Page Content */}
-      <div className="pb-20">
+      <div className="pb-20 mt-6">
         {children}
       </div>
     </div>

@@ -364,38 +364,225 @@ The playground uses AST manipulation to inject logging statements into user code
 - Custom hooks for algorithm execution
 - No external state management library currently used
 
-## 🛠️ Adding New Algorithms
+## 🛠️ Adding New Problems
 
-1. **Create Algorithm Steps**
-   ```typescript
-   // src/features/dsa/algorithms/newAlgorithmSteps.ts
-   export const newAlgorithmSteps = [
-     { action: 'initialize', data: {...} },
-     // Define step-by-step execution
-   ];
+### Adding to an Existing Topic
+
+1. **Create Problem Directory Structure**
+   ```bash
+   src/domains/{existing-topic}/{new-pattern}/
+   ├── index.ts                 # Pattern definition and exports
+   ├── algorithm.ts            # Step generation function
+   ├── visualizer.tsx          # React visualization component
+   └── problem.ts              # Problem definition and exports
    ```
 
-2. **Add to Topics Data**
+2. **Create Algorithm Steps (`algorithm.ts`)**
    ```typescript
-   // src/features/dsa/data/topics.ts
-   export const dsaTopics: Topic[] = [
-     // Add new problem to appropriate topic/pattern
-   ];
-   ```
+   import type { Step } from '@/shared/types/step';
 
-3. **Create Visualizer (if needed)**
-   ```typescript
-   // src/features/dsa/visualizer/NewAlgorithmVisualizer.tsx
-   export function NewAlgorithmVisualizer({ steps }: Props) {
-     // Implement visualization logic
+   export function generateYourAlgorithmSteps(/* input params */): Step[] {
+     const steps: Step[] = [];
+
+     // Add initial state
+     steps.push({
+       message: "Starting algorithm...",
+       array: [...inputArray],
+       // other visualization data
+     });
+
+     // Add algorithm execution steps
+     // Each step represents one visualization frame
+
+     return steps;
    }
    ```
 
-4. **Update Routing**
+3. **Create Visualizer Component (`visualizer.tsx`)**
    ```typescript
-   // src/app/(dsa)/[topic]/[pattern]/[problemId]/page.tsx
-   // Add case for new algorithm ID
+   import type { Step } from '@/shared/types/step';
+
+   export function YourVisualizer({ step }: { step: Step }) {
+     const { array, pointers, message } = step;
+
+     return (
+       <div className="flex flex-col items-center space-y-8">
+         {/* Render your visualization here */}
+         <div className="flex gap-2">
+           {array?.map((value, index) => (
+             <div key={index} className="...">
+               {value}
+             </div>
+           ))}
+         </div>
+         <p>{message}</p>
+       </div>
+     );
+   }
    ```
+
+4. **Define Problem (`problem.ts`)**
+   ```typescript
+   import { Problem } from '@/shared/types/domain';
+
+   export const yourProblem: Problem = {
+     id: 'your-algorithm-name',
+     title: 'Your Algorithm Title',
+     difficulty: 'Easy' | 'Medium' | 'Hard',
+     description: 'Clear description of what the algorithm does...',
+   };
+
+   export { YourVisualizer } from './visualizer';
+   export { generateYourAlgorithmSteps } from './algorithm';
+   ```
+
+5. **Create Pattern Index (`index.ts`)**
+   ```typescript
+   import { Pattern } from '@/shared/types/domain';
+   import { yourProblem } from './problem';
+
+   export const yourPattern: Pattern = {
+     id: 'your-pattern-name',
+     title: 'Pattern Display Name',
+     description: 'What this pattern teaches...',
+     problems: [yourProblem],
+   };
+
+   export * from './problem';
+   ```
+
+6. **Update Topic Index**
+   ```typescript
+   // In src/domains/{existing-topic}/index.ts
+   import { yourPattern } from './your-pattern';
+
+   export const existingTopic: Topic = {
+     // ... existing properties
+     patterns: [
+       // ... existing patterns
+       yourPattern,
+     ],
+   };
+
+   export * from './your-pattern';
+   ```
+
+7. **Update Constants**
+   ```typescript
+   // In src/shared/utils/constants.ts
+   export const AVAILABLE_VISUALIZERS = [
+     // ... existing visualizers
+     'your-algorithm-name',
+   ];
+
+   export const DEFAULT_ALGORITHM_INPUTS = {
+     // ... existing inputs
+     'your-algorithm-name': {
+       // Default input values for testing
+       array: [1, 2, 3, 4, 5],
+       target: 3
+     },
+   };
+   ```
+
+8. **Update Playground Page**
+   ```typescript
+   // In src/shared/pages/DsaPlaygroundPage.tsx
+
+   // Add imports
+   import { generateYourAlgorithmSteps } from '@/domains/{topic}/{pattern}/algorithm';
+   import { YourVisualizer } from '@/domains/{topic}/{pattern}/visualizer';
+
+   // Add case in defaultSteps useMemo
+   const defaultSteps: Step[] = useMemo(() => {
+     switch (problemId) {
+       case 'your-algorithm-name':
+         return generateYourAlgorithmSteps(/* params */);
+       // ... other cases
+     }
+   }, [/* dependencies */]);
+
+   // Add case in visualizer render
+   {(() => {
+     switch (problemId) {
+       case 'your-algorithm-name':
+         return <YourVisualizer step={currentStep} />;
+       // ... other cases
+     }
+   })()}
+   ```
+
+### Adding a New Topic (Domain)
+
+1. **Create Domain Structure**
+   ```bash
+   src/domains/{new-domain}/
+   ├── index.ts                           # Export domain topic
+   └── {pattern-name}/
+       ├── index.ts                       # Export pattern
+       ├── algorithm.ts                   # Algorithm implementation
+       ├── visualizer.tsx                 # Visualization component
+       └── problem.ts                     # Problem definition
+   ```
+
+2. **Follow steps 2-5 from "Adding to Existing Topic"**
+
+3. **Create Domain Index (`src/domains/{new-domain}/index.ts`)**
+   ```typescript
+   import { Topic } from '@/shared/types/domain';
+   import { yourPattern } from './your-pattern';
+
+   export const yourTopic: Topic = {
+     id: 'domain-name',
+     title: 'Domain Display Name',
+     description: 'What this domain covers...',
+     icon: 'IconName', // From lucide-react
+     patterns: [yourPattern],
+   };
+
+   export * from './your-pattern';
+   ```
+
+4. **Register in Domain Registry**
+   ```typescript
+   // In src/shared/services/domainRegistry.ts
+   import { yourTopic } from '@/domains/your-domain';
+
+   const topics: Topic[] = [
+     // ... existing topics
+     yourTopic,
+   ];
+   ```
+
+### Example: Adding Binary Tree Search
+
+```typescript
+// src/domains/trees/binary-search-tree/problem.ts
+export const binarySearchTreeProblem: Problem = {
+  id: 'binary-search-tree',
+  title: 'Binary Search Tree',
+  difficulty: 'Medium',
+  description: 'Insert, search, and delete operations in a BST...',
+};
+
+// src/domains/trees/binary-search-tree/algorithm.ts
+export function generateBSTSteps(operation: string, value: number): Step[] {
+  // Implementation here
+}
+
+// src/domains/trees/binary-search-tree/visualizer.tsx
+export function BSTVisualizer({ step }: { step: Step }) {
+  // Tree visualization here
+}
+```
+
+### Testing Your Addition
+
+1. **Start development server**: `npm run dev`
+2. **Navigate to your problem**: Go to the appropriate topic/pattern/problem URL
+3. **Test visualization**: Verify step-by-step execution works
+4. **Check responsiveness**: Test on different screen sizes
+5. **Validate TypeScript**: Run `npm run lint` to check for errors
 
 ## 🤝 Contributing
 
