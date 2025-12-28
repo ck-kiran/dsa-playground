@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 
-import type { Step } from '../../../shared/types/step';
+import type { Step } from '@/shared/types/step';
 
 interface BinarySearchVisualizerProps {
   step: Step;

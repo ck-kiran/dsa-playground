@@ -3,17 +3,17 @@ import type { ProblemModule } from '@/shared/types/problem';
 import { BinarySearchVisualizer } from './visualizer';
 import { generateBinarySearchSteps } from './algorithm';
 
-export const binarySearchProblem: Problem = {
+export const basicBinarySearchProblem: Problem = {
   id: 'binary-search-visualizer',
-  title: 'Binary Search',
+  title: 'Basic Binary Search',
   difficulty: 'Easy',
-  description: 'Visualize how binary search divides the search space.',
+  description: 'Find target element in sorted array using binary search.',
 };
 
-export const binarySearchModule: ProblemModule = {
+export const basicBinarySearchModule: ProblemModule = {
   config: {
     id: 'binary-search-visualizer',
-    title: 'Binary Search',
+    title: 'Basic Binary Search',
     difficulty: 'Easy',
     description: 'Given a sorted array of integers and a target value, return the index of the target if it is present in the array. If it is not present, return -1.',
     constraints: [
@@ -52,6 +52,3 @@ export const binarySearchModule: ProblemModule = {
   },
   Visualizer: BinarySearchVisualizer,
 };
-
-export { BinarySearchVisualizer } from './visualizer';
-export { generateBinarySearchSteps } from './algorithm';

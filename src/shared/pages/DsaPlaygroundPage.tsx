@@ -13,7 +13,6 @@ import { Controls } from '@/shared/components/ui/Controls';
 import { CodeEditor } from '@/shared/components/ui/CodeEditor';
 
 import type { Step } from '@/shared/types/step';
-import type { ProblemModule } from '@/shared/types/problem';
 
 interface DsaPlaygroundPageProps {
   problemId?: string;
