@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ExternalLink, PlayCircle } from 'lucide-react';
 
+import { PageLayout } from '@/components/layout/PageLayout';
 import { DataTable, DataTableColumn, DataTableFilter } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
 import { dsaTopics, Problem } from '@/features/dsa/data/topics';
@@ -328,14 +329,14 @@ export default function ProblemsPage() {
   );
 
   return (
-    <div className="container mx-auto p-6 space-y-6 max-h-screen overflow-y-auto">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">DSA Problems</h1>
-        <p className="text-muted-foreground">
-          Browse and practice Data Structures & Algorithms problems with interactive visualizations.
-        </p>
-      </div>
-
+    <PageLayout
+      title="DSA Problems"
+      description="Browse and practice Data Structures & Algorithms problems with interactive visualizations."
+      breadcrumbs={[
+        { label: 'DSA Dashboard', href: '/' },
+        { label: 'Problems' }
+      ]}
+    >
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div className="p-4 bg-card border rounded-lg">
@@ -379,6 +380,6 @@ export default function ProblemsPage() {
         }}
         className="w-full"
       />
-    </div>
+    </PageLayout>
   );
 }

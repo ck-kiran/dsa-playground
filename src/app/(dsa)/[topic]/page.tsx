@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { PageLayout } from '@/components/layout/PageLayout';
 import { dsaTopics } from '@/features/dsa/data/topics';
 
 export async function generateStaticParams() {
@@ -19,13 +20,15 @@ export default async function TopicPage({ params }: { params: Promise<{ topic: s
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-8 overflow-y-auto h-full">
-      <div className="mb-10">
-        <h1 className="text-4xl font-bold mb-4 capitalize">{topic.title}</h1>
-        <p className="text-xl text-muted-foreground">{topic.description}</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-20">
+    <PageLayout
+      title={topic.title}
+      description={topic.description}
+      breadcrumbs={[
+        { label: 'DSA Dashboard', href: '/' },
+        { label: topic.title }
+      ]}
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {topic.patterns.length > 0 ? (
           topic.patterns.map(pattern => (
             <Link
@@ -49,6 +52,6 @@ export default async function TopicPage({ params }: { params: Promise<{ topic: s
           </div>
         )}
       </div>
-    </div>
+    </PageLayout>
   );
 }

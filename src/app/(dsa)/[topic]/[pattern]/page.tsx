@@ -2,6 +2,7 @@ import { Play } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { PageLayout } from '@/components/layout/PageLayout';
 import { Button } from '@/components/ui/button';
 import { dsaTopics } from '@/features/dsa/data/topics';
 
@@ -32,18 +33,16 @@ export default async function PatternPage({
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-8 overflow-y-auto h-full">
-      <div className="mb-8">
-        <div className="text-sm text-muted-foreground mb-2 flex items-center gap-2">
-          <span className="capitalize">{topic.title}</span>
-          <span>/</span>
-          <span className="font-medium text-foreground">{pattern.title}</span>
-        </div>
-        <h1 className="text-3xl font-bold tracking-tight mb-2">{pattern.title}</h1>
-        <p className="text-lg text-muted-foreground">{pattern.description}</p>
-      </div>
-
-      <div className="border rounded-lg overflow-hidden bg-card mb-20">
+    <PageLayout
+      title={pattern.title}
+      description={pattern.description}
+      breadcrumbs={[
+        { label: 'DSA Dashboard', href: '/' },
+        { label: topic.title, href: `/${topic.id}` },
+        { label: pattern.title }
+      ]}
+    >
+      <div className="border rounded-lg overflow-hidden bg-card">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead className="bg-muted/50 border-b">
@@ -94,6 +93,6 @@ export default async function PatternPage({
           </table>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }
