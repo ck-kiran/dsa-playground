@@ -1,5 +1,14 @@
 import React from 'react';
 
+export interface CodeApproach {
+  id: string;
+  title: string;
+  description: string;
+  code: string;
+  timeComplexity: string;
+  spaceComplexity: string;
+}
+
 export interface ProblemConfig {
   id: string;
   title: string;
@@ -8,12 +17,13 @@ export interface ProblemConfig {
   constraints: string[];
   defaultCode: string;
   defaultInputs?: Record<string, unknown>;
+  approaches?: CodeApproach[];
 }
 
 export interface ProblemModule {
   config: ProblemConfig;
   generateSteps: (inputs: Record<string, unknown>) => any[];
-  Visualizer: React.ComponentType<{ step: any }>;
+  Visualizer?: React.ComponentType<{ step: any }>;
   inputControls?: React.ComponentType<{
     inputs: Record<string, unknown>;
     onChange: (inputs: Record<string, unknown>) => void;

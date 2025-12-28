@@ -28,11 +28,12 @@ const BINARY_SEARCH_CODE = `function binarySearch(arr, target) {
 
 interface CodeEditorProps {
   initialCode?: string;
+  value?: string;
   onChange?: (value: string | undefined) => void;
   readOnly?: boolean;
 }
 
-export function CodeEditor({ initialCode, onChange, readOnly = false }: CodeEditorProps) {
+export function CodeEditor({ initialCode, value, onChange, readOnly = false }: CodeEditorProps) {
   const { theme, systemTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -54,7 +55,8 @@ export function CodeEditor({ initialCode, onChange, readOnly = false }: CodeEdit
       <Editor
         height="100%"
         defaultLanguage="javascript"
-        defaultValue={initialCode || BINARY_SEARCH_CODE}
+        value={value}
+        defaultValue={value ? undefined : (initialCode || BINARY_SEARCH_CODE)}
         theme={editorTheme}
         onChange={onChange}
         options={{

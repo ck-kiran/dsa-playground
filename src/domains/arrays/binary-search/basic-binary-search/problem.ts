@@ -45,6 +45,74 @@ export const basicBinarySearchModule: ProblemModule = {
       array: [2, 5, 8, 12, 16, 23, 38, 56, 72, 91],
       target: 23,
     },
+    approaches: [
+      {
+        id: 'optimized',
+        title: 'Optimized Binary Search',
+        description: 'Standard iterative binary search with optimal performance',
+        code: `function binarySearch(arr, target) {
+  let left = 0;
+  let right = arr.length - 1;
+
+  while (left <= right) {
+    const mid = Math.floor((left + right) / 2);
+
+    if (arr[mid] === target) {
+      return mid;
+    }
+
+    if (arr[mid] < target) {
+      left = mid + 1;
+    } else {
+      right = mid - 1;
+    }
+  }
+
+  return -1;
+}`,
+        timeComplexity: 'O(log N)',
+        spaceComplexity: 'O(1)'
+      },
+      {
+        id: 'recursive',
+        title: 'Recursive Binary Search',
+        description: 'Recursive implementation of binary search',
+        code: `function binarySearch(arr, target, left = 0, right = arr.length - 1) {
+  if (left > right) {
+    return -1;
+  }
+
+  const mid = Math.floor((left + right) / 2);
+
+  if (arr[mid] === target) {
+    return mid;
+  }
+
+  if (arr[mid] < target) {
+    return binarySearch(arr, target, mid + 1, right);
+  } else {
+    return binarySearch(arr, target, left, mid - 1);
+  }
+}`,
+        timeComplexity: 'O(log N)',
+        spaceComplexity: 'O(log N)'
+      },
+      {
+        id: 'brute-force',
+        title: 'Linear Search (Brute Force)',
+        description: 'Simple linear search approach for comparison',
+        code: `function linearSearch(arr, target) {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] === target) {
+      return i;
+    }
+  }
+  return -1;
+}`,
+        timeComplexity: 'O(N)',
+        spaceComplexity: 'O(1)'
+      }
+    ]
   },
   generateSteps: (inputs) => {
     const { array, target } = inputs as { array: number[]; target: number };

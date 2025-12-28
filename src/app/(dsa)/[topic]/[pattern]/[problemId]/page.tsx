@@ -28,7 +28,7 @@ export default function ProblemPage({
   const isVisualizerAvailable = getVisualizerStatus(problem.id) === 'Available';
 
   if (isVisualizerAvailable) {
-    return <DsaPlaygroundPage problemId={problem.id} />;
+    return <DsaPlaygroundPage problemId={problem.id} topicId={resolvedParams.topic} patternId={resolvedParams.pattern} />;
   }
 
   return (

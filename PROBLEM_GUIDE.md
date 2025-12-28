@@ -13,14 +13,37 @@ The new "Problem-as-a-Module" architecture with auto-discovery makes adding prob
 
 ## 📁 File Structure
 
-Each problem is completely self-contained in its domain folder:
+Each **pattern** contains multiple related **problems**:
 
 ```
 src/domains/{topic}/{pattern}/
-├── algorithm.ts          # Step generation logic
-├── visualizer.tsx        # React visualization component
-├── problem.ts           # Problem configuration and module export
-└── index.ts             # Pattern exports (auto-generated)
+├── {problem-1}/
+│   ├── algorithm.ts      # Step generation logic
+│   ├── visualizer.tsx    # React visualization component
+│   └── problem.ts        # Problem configuration and module export
+├── {problem-2}/
+│   ├── algorithm.ts
+│   ├── visualizer.tsx
+│   └── problem.ts
+├── {problem-3}/
+│   └── ...
+└── index.ts              # Pattern definition listing all problems
+```
+
+**Example: Binary Search Pattern**
+```
+src/domains/arrays/binary-search/
+├── basic-binary-search/
+│   ├── algorithm.ts
+│   ├── visualizer.tsx
+│   └── problem.ts
+├── search-insert-position/
+│   ├── algorithm.ts
+│   ├── visualizer.tsx
+│   └── problem.ts
+├── find-first-last/
+│   └── ...
+└── index.ts              # Lists all binary search problems
 ```
 
 ## 🚀 Adding a New Problem (TRUE Drop-in!)
@@ -38,7 +61,19 @@ Adding a new problem requires **two layers** of integration:
 
 ### Step 1: Create Problem Files
 
-Create the three required files in your domain folder:
+Create the three required files in your **pattern/problem** folder:
+
+```bash
+# Create problem folder within existing pattern
+src/domains/{topic}/{pattern}/{your-problem}/
+```
+
+**OR** create new pattern if needed:
+
+```bash
+# Create new pattern with first problem
+src/domains/{topic}/{new-pattern}/{first-problem}/
+```
 
 #### `algorithm.ts` - Step Generation Logic
 
@@ -134,19 +169,40 @@ export const yourProblemModule: ProblemModule = {
 Add your problem to the auto-discovery system in `src/domains/index.ts`:
 
 ```typescript
-// Simply add one export line:
-export { yourProblemModule } from './your-topic/your-pattern/problem';
+// Add one export line for your new problem:
+export { yourProblemModule } from './your-topic/your-pattern/your-problem/problem';
 ```
 
 **This enables Layer 1** - the problem will work in the playground, but won't show in navigation yet.
 
-### Step 3: Create Pattern Structure (Navigation!)
+### Step 3: Update Pattern Structure (Navigation!)
 
-Create `src/domains/{topic}/{pattern}/index.ts`:
+**If adding to existing pattern:** Update `src/domains/{topic}/{pattern}/index.ts`:
 
 ```typescript
 import { Pattern } from '@/shared/types/domain';
-import { yourProblem } from './problem';
+import { existingProblem1 } from './existing-problem-1/problem';
+import { yourProblem } from './your-problem/problem'; // Add this line
+
+export const yourPattern: Pattern = {
+  id: 'existing-pattern-name',
+  title: 'Existing Pattern',
+  description: 'Pattern description...',
+  problems: [
+    existingProblem1,
+    yourProblem, // Add this line
+  ],
+};
+
+export * from './existing-problem-1/problem';
+export * from './your-problem/problem'; // Add this line
+```
+
+**If creating new pattern:** Create `src/domains/{topic}/{new-pattern}/index.ts`:
+
+```typescript
+import { Pattern } from '@/shared/types/domain';
+import { yourProblem } from './your-problem/problem';
 
 export const yourPattern: Pattern = {
   id: 'your-pattern-name',
@@ -155,7 +211,7 @@ export const yourPattern: Pattern = {
   problems: [yourProblem],
 };
 
-export * from './problem';
+export * from './your-problem/problem';
 ```
 
 ### Step 4: Add Pattern to Topic

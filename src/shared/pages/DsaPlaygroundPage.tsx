@@ -1,7 +1,8 @@
 'use client';
 
-import { Play, RotateCcw, AlertTriangle, Info, Code2, Presentation, ArrowLeft } from 'lucide-react';
-import { useState, useMemo, useEffect } from 'react';
+import { Play, RotateCcw, AlertTriangle, Info, Code2, Presentation, ArrowLeft, ChevronDown, ChevronRight, Home } from 'lucide-react';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import Link from 'next/link';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -11,17 +12,26 @@ import { problemRegistry } from '@/shared/services/problemRegistry';
 import { ProblemInputControls } from '@/shared/components/ProblemInputControls';
 import { Controls } from '@/shared/components/ui/Controls';
 import { CodeEditor } from '@/shared/components/ui/CodeEditor';
+import { useDomain } from '@/shared/hooks/useDomain';
 
 import type { Step } from '@/shared/types/step';
 
 interface DsaPlaygroundPageProps {
   problemId?: string;
+  topicId?: string;
+  patternId?: string;
 }
 
 export function DsaPlaygroundPage({
   problemId = 'binary-search-visualizer',
+  topicId,
+  patternId,
 }: DsaPlaygroundPageProps) {
   const problemModule = problemRegistry.get(problemId);
+  const { getTopicById, getPatternById } = useDomain();
+
+  const topic = topicId ? getTopicById(topicId) : null;
+  const pattern = topicId && patternId ? getPatternById(topicId, patternId) : null;
 
   if (!problemModule) {
     return (
@@ -45,6 +55,9 @@ export function DsaPlaygroundPage({
   const [userCode, setUserCode] = useState(config.defaultCode);
   const [customSteps, setCustomSteps] = useState<Step[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [selectedApproach, setSelectedApproach] = useState(config.approaches?.[0]?.id || 'default');
+  const [isApproachDropdownOpen, setIsApproachDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Problem inputs state
   const [inputs, setInputs] = useState<Record<string, unknown>>(
@@ -61,7 +74,40 @@ export function DsaPlaygroundPage({
     setInputs(config.defaultInputs || {});
     setCurrentStepIndex(0);
     setActiveTab('code');
+    setSelectedApproach(config.approaches?.[0]?.id || 'default');
   }
+
+  // Get selected approach
+  const currentApproach = config.approaches?.find(a => a.id === selectedApproach);
+  const displayCode = currentApproach?.code || config.defaultCode;
+
+  // Handle approach change
+  const handleApproachChange = (approachId: string) => {
+    setSelectedApproach(approachId);
+    const approach = config.approaches?.find(a => a.id === approachId);
+    setUserCode(approach?.code || config.defaultCode);
+    setIsApproachDropdownOpen(false);
+  };
+
+  // Generate breadcrumb items
+  const breadcrumbItems = [
+    { label: 'Home', href: '/' },
+    ...(topic ? [{ label: topic.title, href: `/${topicId}` }] : []),
+    ...(pattern ? [{ label: pattern.title, href: `/${topicId}/${patternId}` }] : []),
+    { label: config.title }
+  ];
+
+  // Handle click outside dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsApproachDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Generate default steps based on current inputs
   const defaultSteps: Step[] = useMemo(() => {
@@ -188,6 +234,30 @@ export function DsaPlaygroundPage({
 
   return (
     <div className="w-full h-full flex flex-col p-4 gap-4 overflow-hidden relative">
+      {/* Breadcrumb */}
+      <div className="shrink-0">
+        <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
+          {breadcrumbItems.map((item, index) => (
+            <div key={index} className="flex items-center space-x-2">
+              {index === 0 && <Home className="w-4 h-4" />}
+              {item.href ? (
+                <Link
+                  href={item.href}
+                  className="hover:text-foreground transition-colors"
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <span className="text-foreground font-medium">{item.label}</span>
+              )}
+              {index < breadcrumbItems.length - 1 && (
+                <ChevronRight className="w-4 h-4" />
+              )}
+            </div>
+          ))}
+        </nav>
+      </div>
+
       {/* Header Bar */}
       <div className="flex items-center justify-between shrink-0 px-2 h-10">
         <div className="flex items-center gap-4">
@@ -257,15 +327,47 @@ export function DsaPlaygroundPage({
           <div className="flex-1 flex flex-col gap-4 overflow-hidden">
             <div className="flex-1 flex flex-col overflow-hidden bg-card border rounded-xl shadow-sm h-full">
               <div className="px-4 py-2 border-b bg-muted/30 flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-2 text-sm font-medium">
-                  <Code2 className="w-4 h-4 text-primary" />
-                  Solution
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2 text-sm font-medium">
+                    <Code2 className="w-4 h-4 text-primary" />
+                    Solution
+                  </div>
+                  {/* Code Approach Dropdown */}
+                  {config.approaches && config.approaches.length > 0 && (
+                    <div ref={dropdownRef} className="relative">
+                      <button
+                        onClick={() => setIsApproachDropdownOpen(!isApproachDropdownOpen)}
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium border rounded-md hover:bg-muted/50 transition-colors"
+                      >
+                        {currentApproach?.title || 'Default'}
+                        <ChevronDown className="w-3 h-3" />
+                      </button>
+                      {isApproachDropdownOpen && (
+                        <div className="absolute top-full left-0 mt-1 min-w-[200px] bg-background border rounded-md shadow-lg z-50">
+                          {config.approaches.map((approach) => (
+                            <button
+                              key={approach.id}
+                              onClick={() => handleApproachChange(approach.id)}
+                              className={`w-full px-3 py-2 text-left text-xs hover:bg-muted transition-colors ${
+                                selectedApproach === approach.id ? 'bg-muted' : ''
+                              }`}
+                            >
+                              <div className="font-medium">{approach.title}</div>
+                              <div className="text-muted-foreground text-[10px] mt-0.5">
+                                Time: {approach.timeComplexity} | Space: {approach.spaceComplexity}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setUserCode(config.defaultCode)}
+                    onClick={() => setUserCode(currentApproach?.code || config.defaultCode)}
                     title="Reset Code"
                   >
                     <RotateCcw className="w-4 h-4 text-muted-foreground hover:text-foreground" />
@@ -280,7 +382,7 @@ export function DsaPlaygroundPage({
                 </div>
               </div>
               <div className="flex-1 min-h-0">
-                <CodeEditor initialCode={userCode} onChange={v => setUserCode(v || '')} />
+                <CodeEditor value={userCode} onChange={v => setUserCode(v || '')} />
               </div>
             </div>
 
@@ -322,7 +424,7 @@ export function DsaPlaygroundPage({
             </div>
 
             <div className="flex-1 relative flex items-center justify-center p-8 bg-background/50 overflow-y-auto">
-              <VisualizerComponent step={currentStep} />
+              {VisualizerComponent && <VisualizerComponent step={currentStep} />}
             </div>
 
             <div className="p-4 border-t bg-muted/10 shrink-0">
