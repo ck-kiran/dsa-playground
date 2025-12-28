@@ -44,141 +44,7 @@ export default function ProblemsPage() {
     )
   );
 
-  // Add some mock problems to demonstrate pagination
-  const mockProblems: ExtendedProblem[] = [
-    {
-      id: 'valid-parentheses',
-      title: 'Valid Parentheses',
-      difficulty: 'Easy',
-      description: 'Determine if the input string is valid with properly matched parentheses.',
-      topic: 'strings',
-      topicTitle: 'Strings',
-      pattern: 'pattern-matching',
-      patternTitle: 'Pattern Matching',
-      hasVisualizer: false,
-      route: '/strings/pattern-matching/valid-parentheses',
-      status: 'Coming Soon'
-    },
-    {
-      id: 'longest-substring',
-      title: 'Longest Substring Without Repeating Characters',
-      difficulty: 'Medium',
-      description: 'Find the length of the longest substring without repeating characters.',
-      topic: 'strings',
-      topicTitle: 'Strings',
-      pattern: 'pattern-matching',
-      patternTitle: 'Pattern Matching',
-      hasVisualizer: false,
-      route: '/strings/pattern-matching/longest-substring',
-      status: 'Coming Soon'
-    },
-    {
-      id: 'merge-intervals',
-      title: 'Merge Intervals',
-      difficulty: 'Medium',
-      description: 'Given an array of intervals, merge all overlapping intervals.',
-      topic: 'arrays',
-      topicTitle: 'Arrays',
-      pattern: 'two-pointers',
-      patternTitle: 'Two Pointers',
-      hasVisualizer: false,
-      route: '/arrays/two-pointers/merge-intervals',
-      status: 'Coming Soon'
-    },
-    {
-      id: 'container-most-water',
-      title: 'Container With Most Water',
-      difficulty: 'Medium',
-      description: 'Find two lines that together with the x-axis forms a container.',
-      topic: 'arrays',
-      topicTitle: 'Arrays',
-      pattern: 'two-pointers',
-      patternTitle: 'Two Pointers',
-      hasVisualizer: false,
-      route: '/arrays/two-pointers/container-most-water',
-      status: 'Coming Soon'
-    },
-    {
-      id: 'linked-list-cycle',
-      title: 'Linked List Cycle',
-      difficulty: 'Easy',
-      description: 'Determine if a linked list has a cycle in it.',
-      topic: 'linked-lists',
-      topicTitle: 'Linked Lists',
-      pattern: 'list-manipulation',
-      patternTitle: 'List Manipulation',
-      hasVisualizer: false,
-      route: '/linked-lists/list-manipulation/linked-list-cycle',
-      status: 'Coming Soon'
-    },
-    {
-      id: 'merge-two-sorted-lists',
-      title: 'Merge Two Sorted Lists',
-      difficulty: 'Easy',
-      description: 'Merge two sorted linked lists and return it as a new sorted list.',
-      topic: 'linked-lists',
-      topicTitle: 'Linked Lists',
-      pattern: 'list-manipulation',
-      patternTitle: 'List Manipulation',
-      hasVisualizer: false,
-      route: '/linked-lists/list-manipulation/merge-two-sorted-lists',
-      status: 'Coming Soon'
-    },
-    {
-      id: 'maximum-depth-binary-tree',
-      title: 'Maximum Depth of Binary Tree',
-      difficulty: 'Easy',
-      description: 'Find the maximum depth of a binary tree.',
-      topic: 'trees',
-      topicTitle: 'Trees',
-      pattern: 'tree-traversal',
-      patternTitle: 'Tree Traversal',
-      hasVisualizer: false,
-      route: '/trees/tree-traversal/maximum-depth-binary-tree',
-      status: 'Coming Soon'
-    },
-    {
-      id: 'validate-binary-search-tree',
-      title: 'Validate Binary Search Tree',
-      difficulty: 'Medium',
-      description: 'Determine if a given binary tree is a valid binary search tree.',
-      topic: 'trees',
-      topicTitle: 'Trees',
-      pattern: 'tree-traversal',
-      patternTitle: 'Tree Traversal',
-      hasVisualizer: false,
-      route: '/trees/tree-traversal/validate-binary-search-tree',
-      status: 'Coming Soon'
-    },
-    {
-      id: 'group-anagrams',
-      title: 'Group Anagrams',
-      difficulty: 'Medium',
-      description: 'Given an array of strings, group the anagrams together.',
-      topic: 'hash-maps',
-      topicTitle: 'Hash Maps',
-      pattern: 'basic-hashing',
-      patternTitle: 'Basic Hashing',
-      hasVisualizer: false,
-      route: '/hash-maps/basic-hashing/group-anagrams',
-      status: 'Coming Soon'
-    },
-    {
-      id: 'top-k-frequent-elements',
-      title: 'Top K Frequent Elements',
-      difficulty: 'Medium',
-      description: 'Given an integer array, return the k most frequent elements.',
-      topic: 'hash-maps',
-      topicTitle: 'Hash Maps',
-      pattern: 'basic-hashing',
-      patternTitle: 'Basic Hashing',
-      hasVisualizer: false,
-      route: '/hash-maps/basic-hashing/top-k-frequent-elements',
-      status: 'Coming Soon'
-    },
-  ];
-
-  const allProblemsData = [...allProblems, ...mockProblems];
+  const allProblemsData = allProblems;
 
   // Define table columns
   const columns: DataTableColumn<ExtendedProblem>[] = [
@@ -280,35 +146,35 @@ export default function ProblemsPage() {
     },
   ];
 
-  // Define filters
+  // Generate dynamic filters based on actual data
+  const uniqueTopics = [...new Set(allProblemsData.map(p => p.topicTitle))].sort();
+  const uniqueDifficulties = [...new Set(allProblemsData.map(p => p.difficulty))].sort();
+  const uniqueStatuses = [...new Set(allProblemsData.map(p => p.status))].sort();
+
   const filters: DataTableFilter[] = [
     {
       key: 'difficulty',
       label: 'All Difficulties',
-      options: [
-        { value: 'Easy', label: 'Easy' },
-        { value: 'Medium', label: 'Medium' },
-        { value: 'Hard', label: 'Hard' },
-      ],
+      options: uniqueDifficulties.map(difficulty => ({
+        value: difficulty,
+        label: difficulty
+      })),
     },
     {
       key: 'topicTitle',
       label: 'All Topics',
-      options: [
-        { value: 'Arrays', label: 'Arrays' },
-        { value: 'Strings', label: 'Strings' },
-        { value: 'Linked Lists', label: 'Linked Lists' },
-        { value: 'Trees', label: 'Trees' },
-        { value: 'Hash Maps', label: 'Hash Maps' },
-      ],
+      options: uniqueTopics.map(topic => ({
+        value: topic,
+        label: topic
+      })),
     },
     {
       key: 'status',
       label: 'All Statuses',
-      options: [
-        { value: 'Available', label: 'Available' },
-        { value: 'Coming Soon', label: 'Coming Soon' },
-      ],
+      options: uniqueStatuses.map(status => ({
+        value: status,
+        label: status
+      })),
     },
   ];
 
