@@ -4,12 +4,12 @@ import { ChevronRight, Home } from 'lucide-react';
 import Link from 'next/link';
 import { ReactNode } from 'react';
 
-interface BreadcrumbItem {
+export interface BreadcrumbItem {
   label: string;
   href?: string;
 }
 
-interface PageLayoutProps {
+export interface PageLayoutProps {
   title: string;
   description?: string;
   breadcrumbs?: BreadcrumbItem[];

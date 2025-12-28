@@ -1,19 +1,17 @@
+'use client';
+
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { use } from 'react';
 
 import { PageLayout } from '@/components/layout/PageLayout';
-import { dsaTopics } from '@/features/dsa/data/topics';
+import { useDomain } from '@/shared/hooks/useDomain';
 
-export async function generateStaticParams() {
-  return dsaTopics.map(topic => ({
-    topic: topic.id,
-  }));
-}
-
-export default async function TopicPage({ params }: { params: Promise<{ topic: string }> }) {
-  const resolvedParams = await params;
-  const topic = dsaTopics.find(t => t.id === resolvedParams.topic);
+export default function TopicPage({ params }: { params: Promise<{ topic: string }> }) {
+  const resolvedParams = use(params);
+  const { getTopicById } = useDomain();
+  const topic = getTopicById(resolvedParams.topic);
 
   if (!topic) {
     notFound();

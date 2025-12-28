@@ -1,32 +1,23 @@
+'use client';
+
 import { Play } from 'lucide-react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { use } from 'react';
 
 import { PageLayout } from '@/components/layout/PageLayout';
 import { Button } from '@/components/ui/button';
-import { dsaTopics } from '@/features/dsa/data/topics';
+import { useDomain } from '@/shared/hooks/useDomain';
 
-export async function generateStaticParams() {
-  const params = [];
-  for (const topic of dsaTopics) {
-    for (const pattern of topic.patterns) {
-      params.push({
-        topic: topic.id,
-        pattern: pattern.id,
-      });
-    }
-  }
-  return params;
-}
-
-export default async function PatternPage({
+export default function PatternPage({
   params,
 }: {
   params: Promise<{ topic: string; pattern: string }>;
 }) {
-  const resolvedParams = await params;
-  const topic = dsaTopics.find(t => t.id === resolvedParams.topic);
-  const pattern = topic?.patterns.find(p => p.id === resolvedParams.pattern);
+  const resolvedParams = use(params);
+  const { getTopicById, getPatternById } = useDomain();
+  const topic = getTopicById(resolvedParams.topic);
+  const pattern = getPatternById(resolvedParams.topic, resolvedParams.pattern);
 
   if (!topic || !pattern) {
     notFound();

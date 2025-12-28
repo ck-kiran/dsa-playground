@@ -6,7 +6,9 @@ import { ExternalLink, PlayCircle } from 'lucide-react';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { DataTable, DataTableColumn, DataTableFilter } from '@/components/ui/data-table';
 import { Button } from '@/components/ui/button';
-import { dsaTopics, Problem } from '@/features/dsa/data/topics';
+import { useDomain } from '@/shared/hooks/useDomain';
+import { Problem } from '@/shared/types/domain';
+import { getVisualizerStatus } from '@/shared/utils/constants';
 
 // Extended Problem interface with additional metadata
 interface ExtendedProblem extends Problem {
@@ -20,20 +22,13 @@ interface ExtendedProblem extends Problem {
 }
 
 export default function ProblemsPage() {
+  const { topics } = useDomain();
+
   // Flatten all problems from all topics and patterns
-  const allProblems: ExtendedProblem[] = dsaTopics.flatMap((topic) =>
+  const allProblems: ExtendedProblem[] = topics.flatMap((topic) =>
     topic.patterns.flatMap((pattern) =>
       pattern.problems.map((problem) => {
-        // Check if visualizer is available
-        const availableVisualizers = [
-          'binary-search-visualizer',
-          'two-sum-visualizer',
-          'string-search-visualizer',
-          'reverse-list-visualizer',
-          'tree-traversal-visualizer'
-        ];
-
-        const hasVisualizer = availableVisualizers.includes(problem.id);
+        const hasVisualizer = getVisualizerStatus(problem.id) === 'Available';
 
         return {
           ...problem,

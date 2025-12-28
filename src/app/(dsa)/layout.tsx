@@ -1,4 +1,4 @@
-import { DsaSidebar } from '@/features/dsa/components/sidebar/DsaSidebar';
+import { DsaSidebar } from '@/shared/components/DsaSidebar';
 
 export default function DsaLayout({ children }: { children: React.ReactNode }) {
   return (
