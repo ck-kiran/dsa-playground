@@ -233,13 +233,13 @@ export function DsaPlaygroundPage({
   const VisualizerComponent = problemModule.Visualizer;
 
   return (
-    <div className="w-full h-full flex flex-col p-4 gap-4 overflow-hidden relative">
+    <div className="w-full h-full flex flex-col p-2 sm:p-4 gap-2 sm:gap-4 overflow-hidden relative">
       {/* Breadcrumb */}
       <div className="shrink-0">
-        <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
+        <nav className="flex items-center space-x-2 text-xs sm:text-sm text-muted-foreground overflow-x-auto">
           {breadcrumbItems.map((item, index) => (
-            <div key={index} className="flex items-center space-x-2">
-              {index === 0 && <Home className="w-4 h-4" />}
+            <div key={index} className="flex items-center space-x-2 whitespace-nowrap">
+              {index === 0 && <Home className="w-3 h-3 sm:w-4 sm:h-4" />}
               {item.href ? (
                 <Link
                   href={item.href}
@@ -251,7 +251,7 @@ export function DsaPlaygroundPage({
                 <span className="text-foreground font-medium">{item.label}</span>
               )}
               {index < breadcrumbItems.length - 1 && (
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4" />
               )}
             </div>
           ))}
@@ -259,11 +259,11 @@ export function DsaPlaygroundPage({
       </div>
 
       {/* Header Bar */}
-      <div className="flex items-center justify-between shrink-0 px-2 h-10">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold tracking-tight">{config.title}</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between shrink-0 px-2 gap-2 sm:gap-4 min-h-10">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <h1 className="text-lg sm:text-2xl font-bold tracking-tight">{config.title}</h1>
           <span
-            className={`px-2.5 py-0.5 rounded-full text-xs font-semibold
+            className={`px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-semibold
             ${config.difficulty === 'Easy' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
               config.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
               'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'}
@@ -296,24 +296,24 @@ export function DsaPlaygroundPage({
 
       {/* Code View */}
       {activeTab === 'code' && (
-        <div className="flex-1 flex gap-4 min-h-0 animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex-1 flex flex-col lg:flex-row gap-4 min-h-0 animate-in fade-in zoom-in-95 duration-200">
           {/* Left Panel: Problem Statement */}
-          <div className="w-[35%] flex flex-col gap-4 overflow-hidden">
-            <div className="bg-card border rounded-xl flex flex-col shadow-sm h-full overflow-hidden">
+          <div className="w-full lg:w-[35%] flex flex-col gap-4 overflow-hidden">
+            <div className="bg-card border rounded-xl flex flex-col shadow-sm h-full lg:min-h-0 overflow-hidden">
               <div className="px-4 py-3 border-b bg-muted/30 flex items-center gap-2 text-sm font-medium">
                 <Info className="w-4 h-4 text-primary" />
                 Problem Statement
               </div>
-              <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
+              <div className="p-4 lg:p-6 overflow-y-auto custom-scrollbar flex-1">
                 <div className="prose prose-sm dark:prose-invert max-w-none">
-                  <p className="text-muted-foreground leading-relaxed text-base">
+                  <p className="text-muted-foreground leading-relaxed text-sm lg:text-base">
                     {config.description}
                   </p>
 
-                  <h4 className="text-foreground font-semibold mt-6 mb-2 uppercase text-xs tracking-wider">
+                  <h4 className="text-foreground font-semibold mt-4 lg:mt-6 mb-2 uppercase text-xs tracking-wider">
                     Constraints
                   </h4>
-                  <ul className="space-y-1 list-disc pl-4 text-sm text-muted-foreground">
+                  <ul className="space-y-1 list-disc pl-4 text-xs lg:text-sm text-muted-foreground">
                     {config.constraints.map((c, i) => (
                       <li key={i}>{c}</li>
                     ))}
@@ -326,8 +326,8 @@ export function DsaPlaygroundPage({
           {/* Right Panel: Code Editor */}
           <div className="flex-1 flex flex-col gap-4 overflow-hidden">
             <div className="flex-1 flex flex-col overflow-hidden bg-card border rounded-xl shadow-sm h-full">
-              <div className="px-4 py-2 border-b bg-muted/30 flex items-center justify-between shrink-0">
-                <div className="flex items-center gap-4">
+              <div className="px-4 py-2 border-b bg-muted/30 flex flex-col sm:flex-row sm:items-center justify-between shrink-0 gap-2">
+                <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
                   <div className="flex items-center gap-2 text-sm font-medium">
                     <Code2 className="w-4 h-4 text-primary" />
                     Solution
@@ -339,8 +339,8 @@ export function DsaPlaygroundPage({
                         onClick={() => setIsApproachDropdownOpen(!isApproachDropdownOpen)}
                         className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium border rounded-md hover:bg-muted/50 transition-colors"
                       >
-                        {currentApproach?.title || 'Default'}
-                        <ChevronDown className="w-3 h-3" />
+                        <span className="truncate max-w-[120px] sm:max-w-none">{currentApproach?.title || 'Default'}</span>
+                        <ChevronDown className="w-3 h-3 shrink-0" />
                       </button>
                       {isApproachDropdownOpen && (
                         <div className="absolute top-full left-0 mt-1 min-w-[200px] bg-background border rounded-md shadow-lg z-50">
@@ -369,15 +369,18 @@ export function DsaPlaygroundPage({
                     size="sm"
                     onClick={() => setUserCode(currentApproach?.code || config.defaultCode)}
                     title="Reset Code"
+                    className="h-7 w-7 p-0 sm:h-8 sm:w-auto sm:px-3"
                   >
-                    <RotateCcw className="w-4 h-4 text-muted-foreground hover:text-foreground" />
+                    <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground hover:text-foreground" />
                   </Button>
                   <Button
                     size="sm"
                     onClick={handleRunCode}
-                    className="h-8 gap-2 bg-green-600 hover:bg-green-700 text-white border-0"
+                    className="h-7 sm:h-8 gap-1 sm:gap-2 bg-green-600 hover:bg-green-700 text-white border-0 text-xs"
                   >
-                    <Play className="w-3 h-3 fill-current" /> Run & Visualize
+                    <Play className="w-3 h-3 fill-current" />
+                    <span className="hidden sm:inline">Run & Visualize</span>
+                    <span className="sm:hidden">Run</span>
                   </Button>
                 </div>
               </div>
@@ -401,33 +404,34 @@ export function DsaPlaygroundPage({
       {activeTab === 'visualize' && (
         <div className="flex-1 flex flex-col gap-4 min-h-0 animate-in fade-in zoom-in-95 duration-200">
           <div className="flex-1 flex flex-col bg-card border rounded-xl shadow-sm overflow-hidden">
-            <div className="px-4 py-2 border-b bg-muted/30 flex items-center justify-between shrink-0">
+            <div className="px-4 py-2 border-b bg-muted/30 flex flex-col sm:flex-row sm:items-center justify-between shrink-0 gap-2">
               <div className="flex items-center gap-2 text-sm font-medium">
                 <Presentation className="w-4 h-4 text-primary" />
                 Visualization
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                 {/* Dynamic input controls */}
                 <ProblemInputControls
                   problemId={problemId}
                   inputs={inputs}
                   onChange={handleInputChange}
                 />
-                <Button variant="ghost" size="sm" onClick={() => setActiveTab('code')}>
-                  <ArrowLeft className="w-4 h-4 mr-2" /> Back to Code
+                <Button variant="ghost" size="sm" onClick={() => setActiveTab('code')} className="h-7 sm:h-8">
+                  <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                  <span className="text-xs sm:text-sm">Back</span>
                 </Button>
-                <div className="h-4 w-px bg-border mx-1" />
+                <div className="h-4 w-px bg-border mx-1 hidden sm:block" />
                 <Button variant="outline" size="sm" onClick={handleReset} className="h-7 text-xs">
                   <RotateCcw className="w-3 h-3 mr-1" /> Reset
                 </Button>
               </div>
             </div>
 
-            <div className="flex-1 relative flex items-center justify-center p-8 bg-background/50 overflow-y-auto">
+            <div className="flex-1 relative flex items-center justify-center p-4 sm:p-8 bg-background/50 overflow-y-auto">
               {VisualizerComponent && <VisualizerComponent step={currentStep} />}
             </div>
 
-            <div className="p-4 border-t bg-muted/10 shrink-0">
+            <div className="p-2 sm:p-4 border-t bg-muted/10 shrink-0">
               <Controls
                 onNext={handleNext}
                 onReset={handleReset}
