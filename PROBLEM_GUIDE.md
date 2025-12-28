@@ -4,10 +4,12 @@ This guide explains how to add new problems to the DSA Playground using the new 
 
 ## 🎯 Overview
 
-The new "Problem-as-a-Module" architecture makes adding problems much simpler:
+The new "Problem-as-a-Module" architecture with auto-discovery makes adding problems **truly drop-in**:
 
-- **Before**: Required changes in 6+ files across the codebase
-- **After**: Only need to create/modify 3 files and register the problem
+- **Before**: Required changes in 6+ files + manual registration
+- **After**: Create 3 files + add 1 export line = Done!
+
+**Key Innovation**: Auto-discovery eliminates the hidden global coupling of manual registration. No more merge conflicts, no more forgotten registration steps!
 
 ## 📁 File Structure
 
@@ -21,7 +23,18 @@ src/domains/{topic}/{pattern}/
 └── index.ts             # Pattern exports (auto-generated)
 ```
 
-## 🚀 Adding a New Problem
+## 🚀 Adding a New Problem (TRUE Drop-in!)
+
+Adding a new problem requires **two layers** of integration:
+
+### **Layer 1: Problem Module (Auto-Discovery)**
+1. **Create 3 files** in your domain folder
+2. **Add 1 export line** to the domains index
+3. **Auto-discovery handles the rest!**
+
+### **Layer 2: Navigation Structure (Manual)**
+4. **Create pattern structure** for website navigation
+5. **Add pattern to topic** for discoverability
 
 ### Step 1: Create Problem Files
 
@@ -71,19 +84,29 @@ export function YourVisualizerComponent({ step }: { step: Step }) {
 }
 ```
 
-#### `problem.ts` - Problem Configuration
+#### `problem.ts` - Problem Configuration (Both Layers!)
 
 ```typescript
+import { Problem } from '@/shared/types/domain';
 import type { ProblemModule } from '@/shared/types/problem';
 import { YourVisualizerComponent } from './visualizer';
 import { generateYourAlgorithmSteps } from './algorithm';
 
+// Layer 2: Navigation structure problem definition
+export const yourProblem: Problem = {
+  id: 'your-algorithm-id',
+  title: 'Your Algorithm Name',
+  difficulty: 'Easy',
+  description: 'Brief description for navigation.',
+};
+
+// Layer 1: Problem module for auto-discovery
 export const yourProblemModule: ProblemModule = {
   config: {
     id: 'your-algorithm-id',
     title: 'Your Algorithm Name',
     difficulty: 'Easy', // Easy | Medium | Hard
-    description: 'Description of what your algorithm does...',
+    description: 'Detailed description of what your algorithm does...',
     constraints: [
       'Time Complexity: O(N)',
       'Space Complexity: O(1)',
@@ -106,26 +129,56 @@ export const yourProblemModule: ProblemModule = {
 };
 ```
 
-### Step 2: Register the Problem
+### Step 2: Export Your Problem (Auto-Discovery!)
 
-Add your problem to the registry in `src/shared/services/problemLoader.ts`:
+Add your problem to the auto-discovery system in `src/domains/index.ts`:
 
 ```typescript
-// Add import
-import { yourProblemModule } from '@/domains/{topic}/{pattern}/problem';
-
-// Add registration in loadAllProblems()
-export function loadAllProblems() {
-  if (problemsLoaded) return;
-
-  // ... existing registrations
-  registerProblem('your-algorithm-id', yourProblemModule);
-
-  problemsLoaded = true;
-}
+// Simply add one export line:
+export { yourProblemModule } from './your-topic/your-pattern/problem';
 ```
 
-### Step 3: Add Input Controls (Optional)
+**This enables Layer 1** - the problem will work in the playground, but won't show in navigation yet.
+
+### Step 3: Create Pattern Structure (Navigation!)
+
+Create `src/domains/{topic}/{pattern}/index.ts`:
+
+```typescript
+import { Pattern } from '@/shared/types/domain';
+import { yourProblem } from './problem';
+
+export const yourPattern: Pattern = {
+  id: 'your-pattern-name',
+  title: 'Pattern Display Name',
+  description: 'What this pattern teaches...',
+  problems: [yourProblem],
+};
+
+export * from './problem';
+```
+
+### Step 4: Add Pattern to Topic
+
+Update `src/domains/{topic}/index.ts`:
+
+```typescript
+import { yourPattern } from './your-pattern';
+
+export const yourTopic: Topic = {
+  // ... existing properties
+  patterns: [
+    // ... existing patterns
+    yourPattern,
+  ],
+};
+
+export * from './your-pattern';
+```
+
+**This enables Layer 2** - now your problem appears in website navigation!
+
+### Step 5: Add Input Controls (Optional)
 
 If your problem needs custom input controls, add them to `src/shared/components/ProblemInputControls.tsx`:
 
@@ -147,14 +200,25 @@ case 'your-algorithm-id':
   );
 ```
 
-### Step 4: Update Domain Index (if needed)
+### Step 6: Test Your Problem
 
-If you're adding to an existing domain, update the pattern's index file:
+1. **Start development server**: `npm run dev`
+2. **Verify auto-discovery**: Check console for "🚀 Auto-discovered X problem modules"
+3. **Check navigation**:
+   - Visit `/your-topic` - should see your pattern listed
+   - Visit `/your-topic/your-pattern` - should see your problem
+4. **Test playground**: Visit `/your-topic/your-pattern/your-algorithm-id` - should work fully
 
-```typescript
-// In src/domains/{topic}/{pattern}/index.ts
-export { yourProblemModule } from './problem';
-```
+## 🎯 **Why Two Layers?**
+
+- **Layer 1 (Auto-Discovery)**: Handles the actual problem functionality - visualizer, steps, code execution
+- **Layer 2 (Navigation)**: Handles the website structure - menus, breadcrumbs, topic organization
+
+This separation allows:
+- ✅ **Zero coupling** for functionality
+- ✅ **Clear navigation** structure
+- ✅ **Easy testing** (can test problems directly via URL)
+- ✅ **Flexible organization** (same problem could appear in multiple topics)
 
 ## 📝 Step Object Interface
 
@@ -233,11 +297,13 @@ export const binarySearchModule: ProblemModule = {
 ## ✅ Benefits of the New Architecture
 
 1. **Self-contained**: Each problem is in its own module
-2. **No cross-cutting changes**: Adding problems doesn't require modifying core files
+2. **Auto-discovery**: No manual registration, zero hidden coupling
 3. **Type-safe**: Full TypeScript support with proper interfaces
 4. **Consistent**: All problems follow the same structure
-5. **Maintainable**: Easy to understand and modify individual problems
-6. **Scalable**: Can easily add hundreds of problems without complexity
+5. **Two-layer design**: Separates functionality from navigation
+6. **Maintainable**: Easy to understand and modify individual problems
+7. **Scalable**: Can easily add hundreds of problems without complexity
+8. **No merge conflicts**: Auto-discovery eliminates central registration points
 
 ## 🚀 Testing Your Problem
 

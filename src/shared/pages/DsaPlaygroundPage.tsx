@@ -7,7 +7,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { instrumentCode } from '@/lib/code-instrumenter';
 
-import { getProblemModule } from '@/shared/services/problemLoader';
+import { problemRegistry } from '@/shared/services/problemRegistry';
 import { ProblemInputControls } from '@/shared/components/ProblemInputControls';
 import { Controls } from '@/shared/components/ui/Controls';
 import { CodeEditor } from '@/shared/components/ui/CodeEditor';
@@ -22,7 +22,7 @@ interface DsaPlaygroundPageProps {
 export function DsaPlaygroundPage({
   problemId = 'binary-search-visualizer',
 }: DsaPlaygroundPageProps) {
-  const problemModule = getProblemModule(problemId);
+  const problemModule = problemRegistry.get(problemId);
 
   if (!problemModule) {
     return (

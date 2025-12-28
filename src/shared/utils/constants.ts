@@ -1,8 +1,8 @@
-import { getAllProblemIds } from '@/shared/services/problemLoader';
+import { problemRegistry } from '@/shared/services/problemRegistry';
 
 // Visualizer status mapping - now uses dynamic registry
 export const getVisualizerStatus = (problemId: string): 'Available' | 'Coming Soon' => {
-  const availableProblems = getAllProblemIds();
+  const availableProblems = problemRegistry.getAllIds();
   return availableProblems.includes(problemId) ? 'Available' : 'Coming Soon';
 };
 

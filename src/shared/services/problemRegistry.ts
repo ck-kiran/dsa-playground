@@ -1,34 +1,36 @@
 import type { ProblemModule } from '@/shared/types/problem';
+import * as domains from '@/domains';
 
-// Problem registry to manage all problems dynamically
-class ProblemRegistry {
-  private problems = new Map<string, ProblemModule>();
+// Auto-discovery: Extract all problem modules from domains barrel export
+const allProblemModules = Object.values(domains).filter(
+  (module): module is ProblemModule =>
+    module != null && typeof module === 'object' && 'config' in module && 'generateSteps' in module && 'Visualizer' in module
+);
 
-  register(problemId: string, module: ProblemModule) {
-    this.problems.set(problemId, module);
+// Build registry from auto-discovered modules
+const problemModules = new Map<string, ProblemModule>();
+
+allProblemModules.forEach(module => {
+  if (module?.config?.id) {
+    problemModules.set(module.config.id, module);
   }
+});
 
+// Problem registry with auto-discovered modules
+export const problemRegistry = {
   get(problemId: string): ProblemModule | undefined {
-    return this.problems.get(problemId);
-  }
+    return problemModules.get(problemId);
+  },
 
   getAll(): Array<[string, ProblemModule]> {
-    return Array.from(this.problems.entries());
-  }
+    return Array.from(problemModules.entries());
+  },
 
   getAllIds(): string[] {
-    return Array.from(this.problems.keys());
-  }
+    return Array.from(problemModules.keys());
+  },
 
   has(problemId: string): boolean {
-    return this.problems.has(problemId);
+    return problemModules.has(problemId);
   }
-}
-
-// Global registry instance
-export const problemRegistry = new ProblemRegistry();
-
-// Helper to register problems
-export function registerProblem(problemId: string, module: ProblemModule) {
-  problemRegistry.register(problemId, module);
-}
+};
