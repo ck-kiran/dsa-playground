@@ -27,6 +27,17 @@ export { bestTimeToBuyAndSellStockModule } from './arrays/two-pointers/best-time
 
 // Sliding Window Pattern
 export { longestSubarraySumModule } from './arrays/sliding-window/longest-subarray-sum/problem';
+export { longestSubstringWithoutRepeatingCharactersModule } from './arrays/sliding-window/longest-substring-without-repeating/problem';
+export { minimumWindowSubstringModule } from './arrays/sliding-window/minimum-window-substring/problem';
+export { maxConsecutiveOnesIIIModule } from './arrays/sliding-window/max-consecutive-ones-iii/problem';
+export { fruitIntoBasketsModule } from './arrays/sliding-window/fruit-into-baskets/problem';
+export { longestRepeatingCharacterReplacementModule } from './arrays/sliding-window/longest-repeating-char-replacement/problem';
+export { maximumPointsFromCardsModule } from './arrays/sliding-window/maximum-points-from-cards/problem';
+export { longestSubstringWithKUniquesModule } from './arrays/sliding-window/longest-substring-k-uniques/problem';
+export { numberOfSubstringsContainingAllThreeModule } from './arrays/sliding-window/number-substrings-all-three/problem';
+export { binarySubarraysWithSumModule } from './arrays/sliding-window/binary-subarrays-with-sum/problem';
+export { countNumberOfNiceSubarraysModule } from './arrays/sliding-window/count-nice-subarrays/problem';
+export { subarraysWithKDifferentIntegersModule } from './arrays/sliding-window/subarrays-k-different-integers/problem';
 
 // Sorting Pattern
 export { bubbleSortModule } from './arrays/bubble-sort/problem';
