@@ -379,7 +379,7 @@ export function DsaPlaygroundPage({
                     className="h-7 sm:h-8 gap-1 sm:gap-2 bg-green-600 hover:bg-green-700 text-white border-0 text-xs"
                   >
                     <Play className="w-3 h-3 fill-current" />
-                    <span className="hidden sm:inline">Run & Visualize</span>
+                    <span className="hidden sm:inline">Visualize</span>
                     <span className="sm:hidden">Run</span>
                   </Button>
                 </div>

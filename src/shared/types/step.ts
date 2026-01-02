@@ -1,5 +1,6 @@
 export interface Step {
-  array?: number[];
+  array?: number[] | string[];
+  secondArray?: number[]; // For merge operations
   highlightIndices?: number[];
   pointers?: Record<string, number>;
   message?: string;
@@ -26,6 +27,14 @@ export interface Step {
   matches?: number[];
   textIndex?: number;
   patternIndex?: number;
+
+  // For sliding window
+  sum?: number;
+  maxLength?: number;
+  target?: number;
+  currentWindow?: any[];
+  isMaxWindow?: boolean;
+  isComplete?: boolean;
 
   // General purpose
   data?: any;
