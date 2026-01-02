@@ -20,6 +20,10 @@ export { mergeSortedArrayModule } from './arrays/two-pointers/merge-sorted-array
 export { reverseStringModule } from './arrays/two-pointers/reverse-string/problem';
 export { threeSumModule } from './arrays/two-pointers/three-sum/problem';
 export { trappingRainWaterModule } from './arrays/two-pointers/trapping-rain-water/problem';
+export { duplicateZerosModule } from './arrays/two-pointers/duplicate-zeros/problem';
+export { rotateArrayModule } from './arrays/two-pointers/rotate-array/problem';
+export { validMountainArrayModule } from './arrays/two-pointers/valid-mountain-array/problem';
+export { bestTimeToBuyAndSellStockModule } from './arrays/two-pointers/best-time-buy-sell-stock/problem';
 
 // Sliding Window Pattern
 export { longestSubarraySumModule } from './arrays/sliding-window/longest-subarray-sum/problem';
